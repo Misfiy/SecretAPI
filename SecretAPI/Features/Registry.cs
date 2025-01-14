@@ -16,6 +16,7 @@
         /// <summary>
         /// Gets or sets the current id iteration.
         /// </summary>
+        /// <remarks>You should increment this with ++CurrentId when using it.</remarks>
         public static int CurrentId { get; set; }
     }
 }
