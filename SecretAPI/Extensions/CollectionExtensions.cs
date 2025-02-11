@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using LabApi.Features.Wrappers;
     using UnityEngine;
 
     /// <summary>
@@ -17,7 +18,7 @@
         /// <returns>A random value, default value when empty collection.</returns>
         public static T GetRandom<T>(this IEnumerable<T>? collection)
         {
-            if (collection is null)
+            if (collection == null)
                 return default!;
 
             T[] array = collection as T[] ?? collection.ToArray();

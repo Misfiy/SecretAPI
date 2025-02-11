@@ -1,10 +1,9 @@
 ﻿namespace SecretAPI.Interfaces
 {
     using LabApi.Features.Wrappers;
-    using PlayerRoles;
 
     /// <summary>
-    /// Base class for how to handle custom role.
+    /// Base class for implementing custom roles.
     /// </summary>
     public interface ICustomRole
     {
@@ -19,11 +18,6 @@
         public int Id { get; }
 
         /// <summary>
-        /// Gets the <see cref="RoleTypeId"/> the role will spawn as.
-        /// </summary>
-        public RoleTypeId Role { get; }
-
-        /// <summary>
         /// Adds the role to a player.
         /// </summary>
         /// <param name="player">Player to add to.</param>
@@ -36,7 +30,7 @@
         public void RemoveRole(Player player);
 
         /// <summary>
-        /// Checks whether a player is part of this role.
+        /// Checks whether a player is a part of this role.
         /// </summary>
         /// <param name="player">The player to check.</param>
         /// <returns>True if they are, false otherwise.</returns>

@@ -1,5 +1,8 @@
 ﻿namespace SecretAPI.Interfaces
 {
+    using System;
+    using System.Reflection;
+
     /// <summary>
     /// Interface used to define a type that should auto register.
     /// </summary>
@@ -8,7 +11,27 @@
         /// <summary>
         /// Attempts to register the object.
         /// </summary>
-        /// <returns>If it was actually registers.</returns>
+        /// <returns>If it was actually registered.</returns>
         public bool TryRegister();
+
+        /// <summary>
+        /// Registers all <see cref="IRegister"/>.
+        /// </summary>
+        /// <param name="assembly">The assembly to register from.</param>
+        public static void RegisterAllRegisters(Assembly assembly)
+        {
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.IsAbstract || type.IsInterface)
+                    continue;
+
+                if (!typeof(IRegister).IsAssignableFrom(type))
+                    continue;
+
+                object obj = Activator.CreateInstance(type);
+                if (obj is IRegister register)
+                    register.TryRegister();
+            }
+        }
     }
 }

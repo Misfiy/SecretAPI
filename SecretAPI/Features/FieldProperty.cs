@@ -6,8 +6,9 @@
     using HarmonyLib;
 
     /// <summary>
-    /// Handles field properties, such as "readonly int".
+    /// Handles setting field properties.
     /// </summary>
+    /// <remarks>Should only be used for readonly fields.</remarks>
     public class FieldProperty
     {
         private readonly FieldInfo fieldInfo;
@@ -17,7 +18,7 @@
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="propertyName">Property name.</param>
-        public FieldProperty(Type type, string propertyName)
+        internal FieldProperty(Type type, string propertyName)
         {
             fieldInfo = AccessTools.Field(type, propertyName);
             Registry<FieldProperty>.Registered.Add(this);
@@ -29,13 +30,13 @@
         ~FieldProperty() => Registry<FieldProperty>.Registered.Remove(this);
 
         /// <summary>
-        /// Gets or creates the FieldProperty for the type & property name.
+        /// Gets or creates the FieldProperty for the specified property.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="propertyName">The property.</param>
         /// <returns>The FieldProperty found/created.</returns>
         public static FieldProperty Get(Type type, string propertyName)
-            => Registry<FieldProperty>.Registered.FirstOrDefault() ?? new FieldProperty(type, propertyName);
+            => Registry<FieldProperty>.Registered.FirstOrDefault(property => property.fieldInfo.FieldType == type && property.fieldInfo.Name == propertyName) ?? new FieldProperty(type, propertyName);
 
         /// <summary>
         /// Sets the value of a field.
@@ -43,5 +44,8 @@
         /// <param name="owner">The owner of the field.</param>
         /// <param name="value">The value to set.</param>
         public void SetValue(object? owner, object value) => fieldInfo.SetValue(owner, value);
+
+        /// <inheritdoc/>
+        public override string ToString() => $"{fieldInfo.FieldType}::{fieldInfo.Name}";
     }
 }

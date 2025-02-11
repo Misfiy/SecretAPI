@@ -11,7 +11,7 @@
         /// <summary>
         /// Gets the registered objects.
         /// </summary>
-        public static List<T> Registered { get; } = new();
+        public static List<T> Registered { get; } = [];
 
         /// <summary>
         /// Gets or sets the current id iteration.
