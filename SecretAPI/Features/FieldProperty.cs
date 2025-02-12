@@ -36,14 +36,20 @@
         /// <param name="propertyName">The property.</param>
         /// <returns>The FieldProperty found/created.</returns>
         public static FieldProperty Get(Type type, string propertyName)
-            => Registry<FieldProperty>.Registered.FirstOrDefault(property => property.fieldInfo.FieldType == type && property.fieldInfo.Name == propertyName) ?? new FieldProperty(type, propertyName);
+        {
+            FieldProperty value = Registry<FieldProperty>.Registered.FirstOrDefault(property =>
+                property.fieldInfo.FieldType == type && property.fieldInfo.Name == propertyName)
+                ?? new FieldProperty(type, propertyName);
+
+            return value;
+        }
 
         /// <summary>
         /// Sets the value of a field.
         /// </summary>
-        /// <param name="owner">The owner of the field.</param>
+        /// <param name="instance">The current instance to modify.</param>
         /// <param name="value">The value to set.</param>
-        public void SetValue(object? owner, object value) => fieldInfo.SetValue(owner, value);
+        public void SetValue(object? instance, object value) => fieldInfo.SetValue(instance, value);
 
         /// <inheritdoc/>
         public override string ToString() => $"{fieldInfo.FieldType}::{fieldInfo.Name}";
