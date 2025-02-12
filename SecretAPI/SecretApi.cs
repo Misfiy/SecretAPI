@@ -1,9 +1,9 @@
 ﻿namespace SecretAPI
 {
     using System;
-    using LabApi.Features.Console;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
+    using MEC;
     using SecretAPI.Features;
 
     /// <summary>
@@ -32,8 +32,7 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            FieldProperty.Get(typeof(SecretApi), nameof(Version)).SetValue(this, new Version(2, 0, 0));
-            Logger.Info(Version);
+            Timing.RunCoroutine(CustomPlayerEffect.CreateObjects());
         }
 
         /// <inheritdoc/>

@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI.Features
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using HarmonyLib;
@@ -18,7 +19,7 @@
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="propertyName">Property name.</param>
-        internal FieldProperty(Type type, string propertyName)
+        private FieldProperty(Type type, string propertyName)
         {
             fieldInfo = AccessTools.Field(type, propertyName);
             Registry<FieldProperty>.Registered.Add(this);
@@ -38,8 +39,8 @@
         public static FieldProperty Get(Type type, string propertyName)
         {
             FieldProperty value = Registry<FieldProperty>.Registered.FirstOrDefault(property =>
-                property.fieldInfo.FieldType == type && property.fieldInfo.Name == propertyName)
-                ?? new FieldProperty(type, propertyName);
+                                      property.fieldInfo.FieldType == type && property.fieldInfo.Name == propertyName)
+                                  ?? new FieldProperty(type, propertyName);
 
             return value;
         }
