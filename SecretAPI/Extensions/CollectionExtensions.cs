@@ -15,11 +15,8 @@
         /// <param name="collection">The collection to pull from.</param>
         /// <typeparam name="T">The Type contained by the collection.</typeparam>
         /// <returns>A random value, default value when empty collection.</returns>
-        public static T GetRandomValue<T>(this IEnumerable<T>? collection)
+        public static T GetRandomValue<T>(this IEnumerable<T> collection)
         {
-            if (collection == null)
-                return default!;
-
             T[] array = collection as T[] ?? collection.ToArray();
             return array[Random.Range(0, array.Length)];
         }
