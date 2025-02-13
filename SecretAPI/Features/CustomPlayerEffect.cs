@@ -42,21 +42,15 @@
         {
             yield return Timing.WaitUntilFalse(NetworkClient.prefabs.IsEmpty);
 
+            GameObject playerPrefab = NetworkClient.prefabs.FirstOrDefault(p => p.Value.name.Contains("Player")).Value;
+            Transform playerEffects = playerPrefab.transform.Find("PlayerEffects");
+
             foreach (Type type in EffectsToRegister)
             {
                 if (!typeof(StatusEffectBase).IsAssignableFrom(type))
                     throw new InvalidTypeException($"[CustomPlayerEffect.CreateObjects] {type.FullName} is not a valid StatusEffectBase");
 
-                GameObject playerPrefab = NetworkClient.prefabs.FirstOrDefault(p => p.Value.name.Contains("Player")).Value;
-                Transform playerEffects = playerPrefab.transform.Find("PlayerEffects");
-
-                _ = new GameObject(type.Name, type)
-                {
-                    transform =
-                    {
-                        parent = playerEffects,
-                    },
-                };
+                new GameObject(type.Name, type).transform.parent = playerEffects;
             }
         }
     }

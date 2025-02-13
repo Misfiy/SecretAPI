@@ -18,8 +18,10 @@
         /// Registers all <see cref="IRegister"/>.
         /// </summary>
         /// <param name="assembly">The assembly to register from.</param>
-        public static void RegisterAllRegisters(Assembly assembly)
+        public static void RegisterAllRegisters(Assembly? assembly)
         {
+            assembly ??= Assembly.GetCallingAssembly();
+
             foreach (Type type in assembly.GetTypes())
             {
                 if (type.IsAbstract || type.IsInterface)
