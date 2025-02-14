@@ -39,7 +39,7 @@
         public override string ToString() => $"{GetType().FullName}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
 
         /// <summary>
-        /// Creates objects.
+        /// Initializes the <see cref="CustomPlayerEffect"/> to implement <see cref="EffectsToRegister"/>.
         /// </summary>
         internal static void Initialize()
         {

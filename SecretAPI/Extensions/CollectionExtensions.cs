@@ -10,7 +10,7 @@
     public static class CollectionExtensions
     {
         /// <summary>
-        /// Gets a random value from the list.
+        /// Gets a random value from the collection.
         /// </summary>
         /// <param name="collection">The collection to pull from.</param>
         /// <typeparam name="T">The Type contained by the collection.</typeparam>
