@@ -18,6 +18,7 @@
     {
         /// <summary>
         /// Gets a list of types to register (Must inherit <see cref="StatusEffectBase"/>).
+        /// <remarks>Must be <see cref="Type"/>, can be gotten through e.g. typeof(Scp207).</remarks>
         /// </summary>
         public static List<Type> EffectsToRegister { get; } = [];
 
@@ -33,6 +34,9 @@
             base.Start();
         }
 
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType().FullName}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
+
         /// <summary>
         /// Creates objects.
         /// </summary>
@@ -42,6 +46,7 @@
         {
             yield return Timing.WaitUntilFalse(NetworkClient.prefabs.IsEmpty);
 
+            // get player prefab
             GameObject playerPrefab = NetworkClient.prefabs.FirstOrDefault(p => p.Value.name.Contains("Player")).Value;
             Transform playerEffects = playerPrefab.transform.Find("PlayerEffects");
 
@@ -50,6 +55,7 @@
                 if (!typeof(StatusEffectBase).IsAssignableFrom(type))
                     throw new InvalidTypeException($"[CustomPlayerEffect.CreateObjects] {type.FullName} is not a valid StatusEffectBase");
 
+                // register effect prefab, required
                 new GameObject(type.Name, type).transform.parent = playerEffects;
             }
         }
