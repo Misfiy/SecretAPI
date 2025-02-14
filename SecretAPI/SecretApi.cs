@@ -3,7 +3,6 @@
     using System;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
-    using MEC;
     using SecretAPI.Features;
 
     /// <summary>
@@ -32,7 +31,7 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            Timing.RunCoroutine(CustomPlayerEffect.CreateObjects());
+            CustomPlayerEffect.Initialize();
         }
 
         /// <inheritdoc/>
