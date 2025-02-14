@@ -3,7 +3,7 @@
     using LabApi.Features.Wrappers;
 
     /// <summary>
-    /// Base class for implementing custom roles.
+    /// Base class for defining custom roles.
     /// </summary>
     public interface ICustomRole
     {

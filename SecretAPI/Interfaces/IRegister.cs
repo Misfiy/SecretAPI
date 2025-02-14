@@ -11,14 +11,14 @@
         /// <summary>
         /// Attempts to register the object.
         /// </summary>
-        /// <returns>If it was actually registered.</returns>
+        /// <returns>If it was successfully registered.</returns>
         public bool TryRegister();
 
         /// <summary>
         /// Registers all <see cref="IRegister"/>.
         /// </summary>
         /// <param name="assembly">The assembly to register from.</param>
-        public static void RegisterAllRegisters(Assembly? assembly)
+        public static void RegisterAllRegisters(Assembly? assembly = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 

@@ -2,7 +2,8 @@
 * SecretAPI is a plugin that extends [LabAPI](https://github.com/northwood-studios/LabAPI) by providing extra features to help devs.
 
 # Features
-- Role Extensions: Some extensions to help with RoleTypeId
+- RoleExtensions: Extensions to help with RoleTypeId
+- RoomExtensions: Extensions related to rooms
 - CustomPlayerEffect: Create new status effects
 - IRegister: Handle auto registering certain plugin features
 

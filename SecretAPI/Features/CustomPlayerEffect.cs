@@ -2,13 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
-    using LiteNetLib.Utils;
-    using MEC;
     using Mirror;
     using UnityEngine;
+    using UnityEngine.SceneManagement;
+    using Logger = LabApi.Features.Console.Logger;
 
     /// <summary>
     /// Handles custom player effects.
@@ -16,8 +15,11 @@
     /// </summary>
     public abstract class CustomPlayerEffect : StatusEffectBase
     {
+        private static bool isLoaded;
+
         /// <summary>
         /// Gets a list of types to register (Must inherit <see cref="StatusEffectBase"/>).
+        /// <remarks>Must be <see cref="Type"/>, can be gotten through e.g. typeof(Scp207).</remarks>
         /// </summary>
         public static List<Type> EffectsToRegister { get; } = [];
 
@@ -33,25 +35,34 @@
             base.Start();
         }
 
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType().FullName}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
+
         /// <summary>
         /// Creates objects.
         /// </summary>
-        /// <returns>Coroutine thingy.</returns>
-        /// <exception cref="InvalidTypeException">Type was not StatusEffectBase.</exception>
-        internal static IEnumerator<float> CreateObjects()
+        internal static void Initialize()
         {
-            yield return Timing.WaitUntilFalse(NetworkClient.prefabs.IsEmpty);
-
-            GameObject playerPrefab = NetworkClient.prefabs.FirstOrDefault(p => p.Value.name.Contains("Player")).Value;
-            Transform playerEffects = playerPrefab.transform.Find("PlayerEffects");
-
-            foreach (Type type in EffectsToRegister)
+            SceneManager.sceneLoaded += (_, _) =>
             {
-                if (!typeof(StatusEffectBase).IsAssignableFrom(type))
-                    throw new InvalidTypeException($"[CustomPlayerEffect.CreateObjects] {type.FullName} is not a valid StatusEffectBase");
+                if (isLoaded)
+                    return;
 
-                new GameObject(type.Name, type).transform.parent = playerEffects;
-            }
+                isLoaded = true;
+
+                Transform playerEffects = NetworkManager.singleton.playerPrefab.GetComponent<PlayerEffectsController>().transform;
+                foreach (Type type in EffectsToRegister)
+                {
+                    if (!typeof(StatusEffectBase).IsAssignableFrom(type))
+                    {
+                        Logger.Error($"[CustomPlayerEffect.CreateObjects] {type.FullName} is not a valid StatusEffectBase");
+                        continue;
+                    }
+
+                    // register effect prefab, required
+                    new GameObject(type.Name, type).transform.parent = playerEffects;
+                }
+            };
         }
     }
 }

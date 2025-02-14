@@ -1,7 +1,6 @@
 ﻿namespace SecretAPI.Features
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using HarmonyLib;
@@ -9,7 +8,7 @@
     /// <summary>
     /// Handles setting field properties.
     /// </summary>
-    /// <remarks>Should only be used for readonly fields.</remarks>
+    /// <remarks>Should only be used for readonly/private fields.</remarks>
     public class FieldProperty
     {
         private readonly FieldInfo fieldInfo;
@@ -44,6 +43,12 @@
 
             return value;
         }
+
+        /// <summary>
+        /// Gets the value of the field.
+        /// </summary>
+        /// <param name="instance">The current instance.</param>
+        public void GetValue(object? instance) => fieldInfo.GetValue(instance);
 
         /// <summary>
         /// Sets the value of a field.

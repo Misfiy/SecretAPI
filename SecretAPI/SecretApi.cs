@@ -3,7 +3,6 @@
     using System;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
-    using MEC;
     using SecretAPI.Features;
 
     /// <summary>
@@ -24,7 +23,7 @@
         public override LoadPriority Priority => LoadPriority.Highest;
 
         /// <inheritdoc/>
-        public override Version Version => new(0, 0, 1);
+        public override Version Version => new(0, 0, 2);
 
         /// <inheritdoc/>
         public override Version RequiredApiVersion => new(1, 0, 0);
@@ -32,7 +31,7 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            Timing.RunCoroutine(CustomPlayerEffect.CreateObjects());
+            CustomPlayerEffect.Initialize();
         }
 
         /// <inheritdoc/>
