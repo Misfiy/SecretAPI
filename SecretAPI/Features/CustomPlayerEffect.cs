@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
-    using MEC;
     using Mirror;
     using UnityEngine;
     using UnityEngine.SceneManagement;
