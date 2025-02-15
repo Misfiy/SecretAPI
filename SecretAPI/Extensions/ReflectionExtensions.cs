@@ -1,5 +1,6 @@
 ﻿namespace SecretAPI.Extensions
 {
+    using System;
     using System.Reflection;
 
     /// <summary>
@@ -14,9 +15,10 @@
         /// <param name="destination">Where to copy to.</param>
         public static void CopyProperties(this object source, object destination)
         {
+            Type destinationType = destination.GetType();
             foreach (PropertyInfo property in source.GetType().GetProperties())
             {
-                destination.GetType().GetProperty(property.Name)?.SetValue(destination, property.GetValue(source));
+                destinationType.GetProperty(property.Name)?.SetValue(destination, property.GetValue(source));
             }
         }
     }
