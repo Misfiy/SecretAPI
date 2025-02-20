@@ -12,9 +12,9 @@
     {
         private static readonly List<RoomName> StupidRooms =
         [
-            RoomName.HczTesla,
-            RoomName.EzEvacShelter,
-            RoomName.EzCollapsedTunnel
+            RoomName.HczTesla, // Instant death
+            RoomName.EzEvacShelter, // Stuck permanently
+            RoomName.EzCollapsedTunnel // Stuck permanently
         ];
 
         /// <summary>
