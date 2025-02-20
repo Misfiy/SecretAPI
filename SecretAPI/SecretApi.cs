@@ -23,7 +23,7 @@
         public override LoadPriority Priority => LoadPriority.Highest;
 
         /// <inheritdoc/>
-        public override Version Version => new(0, 1, 0);
+        public override Version Version { get; } = typeof(SecretApi).Assembly.GetName().Version;
 
         /// <inheritdoc/>
         public override Version RequiredApiVersion => new(1, 0, 0);
