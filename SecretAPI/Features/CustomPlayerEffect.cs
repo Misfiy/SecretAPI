@@ -5,12 +5,13 @@
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using SecretAPI.Features.Effects;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using Logger = LabApi.Features.Console.Logger;
 
     /// <summary>
-    /// Handles custom player effects.
+    /// Handles custom player effects. TODO: Move this to Feature.Effects.
     /// <remarks>Must register to <see cref="EffectsToRegister"/> to work.</remarks>
     /// </summary>
     public abstract class CustomPlayerEffect : StatusEffectBase
@@ -39,10 +40,12 @@
         public override string ToString() => $"{GetType().FullName}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
 
         /// <summary>
-        /// Creates objects.
+        /// Initializes the <see cref="CustomPlayerEffect"/> to implement <see cref="EffectsToRegister"/>.
         /// </summary>
         internal static void Initialize()
         {
+            EffectsToRegister.Add(typeof(TemporaryDamageImmunity));
+
             SceneManager.sceneLoaded += (_, _) =>
             {
                 if (isLoaded)
@@ -55,11 +58,11 @@
                 {
                     if (!typeof(StatusEffectBase).IsAssignableFrom(type))
                     {
-                        Logger.Error($"[CustomPlayerEffect.CreateObjects] {type.FullName} is not a valid StatusEffectBase");
+                        Logger.Error($"[CustomPlayerEffect.Initialize] {type.FullName} is not a valid StatusEffectBase and thus could not be registered!");
                         continue;
                     }
 
-                    // register effect prefab, required
+                    // register effect into prefab
                     new GameObject(type.Name, type).transform.parent = playerEffects;
                 }
             };

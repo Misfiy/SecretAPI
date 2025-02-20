@@ -9,6 +9,7 @@
     /// Handles setting field properties.
     /// </summary>
     /// <remarks>Should only be used for readonly/private fields.</remarks>
+    [Obsolete("Use AccessTools.Field(Type, string) instead",  true)]
     public class FieldProperty
     {
         private readonly FieldInfo fieldInfo;
