@@ -1,9 +1,6 @@
 ﻿name: Pull Request CI
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     branches:
       - '**'
@@ -13,7 +10,7 @@ jobs:
     runs-on: windows-latest
     
     env:
-      REFERENCES_URL: https://misaka-zerotwo.github.io/SL-References/Dev.zip
+      REFERENCES_URL: https://exmod-team.github.io/SL-References/Dev.zip
       REFERENCES_PATH: ${{ github.workspace }}/References
 
     steps:
