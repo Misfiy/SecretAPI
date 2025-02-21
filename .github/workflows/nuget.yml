@@ -1,0 +1,6 @@
+﻿name: Push Nuget
+
+on:
+  release:
+    types: [published]
+    
