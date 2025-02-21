@@ -1,4 +1,4 @@
-﻿name: PR CI
+﻿name: Pull Request CI
 
 on:
   push:
@@ -15,3 +15,23 @@ jobs:
     env:
       REFERENCES_URL: https://misaka-zerotwo.github.io/SL-References/Dev.zip
       REFERENCES_PATH: ${{ github.workspace }}/References
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4.0.1
+
+      - name: Download References
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri ${{ env.REFERENCES_URL }} -OutFile "${{ github.workspace }}/References.zip"
+          Expand-Archive -Path "${{ github.workspace }}/References.zip" -DestinationPath ${{ env.REFERENCES_PATH }}
+
+      - name: Build
+        env:
+          SL_REFERENCES: ${{ env.REFERENCES_PATH }}
+        shell: pwsh
+        run: |
+          dotnet build -c Release
