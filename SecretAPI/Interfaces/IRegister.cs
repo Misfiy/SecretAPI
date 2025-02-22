@@ -17,7 +17,7 @@
         /// Registers all <see cref="IRegister"/>.
         /// </summary>
         /// <param name="assembly">The assembly to register from.</param>
-        public static void RegisterAllRegisters(Assembly? assembly = null)
+        public static void RegisterAll(Assembly? assembly = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
@@ -34,5 +34,12 @@
                     register.TryRegister();
             }
         }
+
+        /// <summary>
+        /// Registers all <see cref="IRegister"/>.
+        /// </summary>
+        /// <param name="assembly">The assembly to register from.</param>
+        [Obsolete("Use IRegister.RegisterAll instead.", true)]
+        public static void RegisterAllRegisters(Assembly? assembly = null) => RegisterAll(assembly);
     }
 }
