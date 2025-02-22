@@ -11,8 +11,7 @@
         /// <summary>
         /// Attempts to register the object.
         /// </summary>
-        /// <returns>If it was successfully registered.</returns>
-        public bool TryRegister();
+        public void TryRegister();
 
         /// <summary>
         /// Registers all <see cref="IRegister"/>.
