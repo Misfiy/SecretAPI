@@ -1,0 +1,44 @@
+﻿name: Push Nuget
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    env:
+      REFERENCES_URL: https://ExMod-Team.github.io/SL-References/LabAPI.zip
+      REFERENCES_PATH: ${{ github.workspace }}/References
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4.0.1
+
+      - name: Download References
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri ${{ env.REFERENCES_URL }} -OutFile "${{ github.workspace }}/References.zip"
+          Expand-Archive -Path "${{ github.workspace }}/References.zip" -DestinationPath "${{ env.REFERENCES_PATH }}"
+
+      - name: Rename Assembly-CSharp-Publicized to Assembly-CSharp
+        shell: pwsh
+        run: |
+          Rename-Item -Path "${{ env.REFERENCES_PATH }}\Assembly-CSharp-Publicized.dll" -NewName "Assembly-CSharp.dll"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build -c Release
+
+      - name: Pack NuGet package
+        run: dotnet pack -c Release --output ${GITHUB_WORKSPACE}/nupkgs
+
+      - name: Push NuGet package
+        run: |
+          dotnet nuget push ${GITHUB_WORKSPACE}/nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

@@ -1,17 +1,16 @@
-﻿namespace SecretAPI.Features
+﻿namespace SecretAPI.Features.Effects
 {
     using System;
     using System.Collections.Generic;
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
     using Mirror;
-    using SecretAPI.Features.Effects;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using Logger = LabApi.Features.Console.Logger;
 
     /// <summary>
-    /// Handles custom player effects. TODO: Move this to Feature.Effects.
+    /// Handles custom player effects.
     /// <remarks>Must register to <see cref="EffectsToRegister"/> to work.</remarks>
     /// </summary>
     public abstract class CustomPlayerEffect : StatusEffectBase

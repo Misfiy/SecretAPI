@@ -3,7 +3,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Handles the registration of objects & ids.
+    /// Handles the registration of objects and ids.
     /// </summary>
     /// <typeparam name="T">The type of the registry.</typeparam>
     public static class Registry<T>

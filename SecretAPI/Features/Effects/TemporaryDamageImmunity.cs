@@ -11,6 +11,9 @@
         /// <inheritdoc/>
         public bool DamageModifierActive => IsEnabled;
 
+        /// <inheritdoc />
+        public override EffectClassification Classification => EffectClassification.Technical;
+
         /// <inheritdoc/>
         public float GetDamageModifier(float baseDamage, DamageHandlerBase handler, HitboxType hitboxType) => 0;
     }
