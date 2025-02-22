@@ -3,7 +3,7 @@
     using System;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
-    using SecretAPI.Features;
+    using SecretAPI.Features.Effects;
 
     /// <summary>
     /// Main class handling loading API.
