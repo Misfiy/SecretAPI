@@ -23,7 +23,7 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri ${{ env.REFERENCES_URL }} -OutFile "${{ github.workspace }}/References.zip"
-          Expand-Archive -Path "${{ github.workspace }}/References.zip" -DestinationPath "${{ env.REFERENCES_PATH }}"
+          Expand-Archive -Path "${{ github.workspace }}/References.zip" -DestinationPath ${{ env.REFERENCES_PATH }}
 
       - name: Rename Assembly-CSharp-Publicized to Assembly-CSharp
         shell: pwsh
