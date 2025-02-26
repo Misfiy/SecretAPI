@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI
 {
     using System;
+    using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
     using SecretAPI.Features.Effects;
@@ -10,6 +11,8 @@
     /// </summary>
     public class SecretApi : Plugin
     {
+        private Harmony? harmony;
+
         /// <inheritdoc/>
         public override string Name => "SecretAPI";
 
@@ -31,12 +34,15 @@
         /// <inheritdoc/>
         public override void Enable()
         {
+            harmony = new Harmony(nameof(SecretAPI) + DateTime.Now.Ticks);
+            harmony.PatchAll();
             CustomPlayerEffect.Initialize();
         }
 
         /// <inheritdoc/>
         public override void Disable()
         {
+            harmony?.UnpatchAll(harmony.Id);
         }
     }
 }
