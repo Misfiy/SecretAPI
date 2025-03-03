@@ -42,4 +42,5 @@ jobs:
 
       - name: Push NuGet package
         run: |
-          dotnet nuget push ${GITHUB_WORKSPACE}/nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+          $PackageFile = (Get-ChildItem -Path "${GITHUB_WORKSPACE}/nupkgs" -Include 'SecretAPI.*.nupkg' -Recurse | Select-Object -First 1).FullName
+          dotnet nuget push ${{ env.PackageFile }} --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
