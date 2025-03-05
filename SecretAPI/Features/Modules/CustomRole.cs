@@ -18,7 +18,7 @@
         public int Id { get; } = ++Registry<ICustomRole>.CurrentId;
 
         /// <inheritdoc/>
-        public abstract IRoleSpawnHandler SpawnHandler { get; }
+        public virtual IRoleSpawnHandler SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
 
         /// <inheritdoc />
         public virtual void AddRole(Player player)
