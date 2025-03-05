@@ -22,6 +22,15 @@
         /// </summary>
         public virtual IRoleSpawnHandler SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
 
+        /// <summary>
+        /// Registers the CustomRole.
+        /// </summary>
+        public virtual void TryRegister()
+        {
+            Registry<ICustomRole>.Registered.Add(this);
+            Init();
+        }
+
         /// <inheritdoc />
         public virtual void AddRole(Player player)
         {
@@ -36,5 +45,13 @@
 
         /// <inheritdoc/>
         public virtual bool Check(Player player) => players.Contains(player);
+
+        /// <summary>
+        /// Initializes the CustomRole.
+        /// </summary>
+        protected virtual void Init()
+        {
+            SpawnHandler.AddRole(this);
+        }
     }
 }
