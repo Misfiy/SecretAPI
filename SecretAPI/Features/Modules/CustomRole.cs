@@ -18,6 +18,11 @@
         public int Id { get; } = ++Registry<ICustomRole>.CurrentId;
 
         /// <summary>
+        /// Gets an array of <see cref="ItemType"/> / <see cref="int"/>.
+        /// </summary>
+        public virtual object[] Items { get; } = [];
+
+        /// <summary>
         /// Gets the spawn handler of the role.
         /// </summary>
         public virtual IRoleSpawnHandler SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
@@ -34,13 +39,18 @@
         /// <inheritdoc />
         public virtual void AddRole(Player player)
         {
-            // TODO: logic
+            players.Add(player);
+            RoleAdded(player);
         }
 
         /// <inheritdoc />
         public virtual void RemoveRole(Player player)
         {
-            // TODO: logic
+            if (!Check(player))
+                return;
+
+            players.Remove(player);
+            RoleRemoved(player);
         }
 
         /// <inheritdoc/>
@@ -52,6 +62,22 @@
         protected virtual void Init()
         {
             SpawnHandler.AddRole(this);
+        }
+
+        /// <summary>
+        /// Called when the role has been added to a player.
+        /// </summary>
+        /// <param name="player">The player.</param>
+        protected virtual void RoleAdded(Player player)
+        {
+        }
+
+        /// <summary>
+        /// Called when the role has been removed from a player.
+        /// </summary>
+        /// <param name="player">The player.</param>
+        protected virtual void RoleRemoved(Player player)
+        {
         }
     }
 }

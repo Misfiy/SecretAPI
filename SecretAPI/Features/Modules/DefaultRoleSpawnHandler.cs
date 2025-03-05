@@ -2,7 +2,9 @@
 {
     using System.Collections.Generic;
     using LabApi.Events.Arguments.PlayerEvents;
+    using SecretAPI.Extensions;
     using SecretAPI.Interfaces;
+    using UnityEngine;
 
     /// <summary>
     /// The default <see cref="IRoleSpawnHandler"/> to use in <see cref="CustomRole"/>.
@@ -27,8 +29,13 @@
         /// <inheritdoc />
         public void AddRole(ICustomRole role) => roles.Add(role);
 
-        private void OnChangedRole(PlayerChangedRoleEventArgs args)
+        private void OnChangedRole(PlayerChangedRoleEventArgs ev)
         {
+            if (Random.Range(1, 100) >= 10)
+                return;
+
+            ICustomRole role = roles.GetRandomValue();
+            role.AddRole(ev.Player);
         }
     }
 }
