@@ -3,7 +3,7 @@
     using SecretAPI.Interfaces;
 
     /// <summary>
-    /// The default <see cref="IRoleSpawnHandler"/>.
+    /// The default <see cref="IRoleSpawnHandler"/> to use in <see cref="CustomRole"/>.
     /// </summary>
     public class DefaultRoleSpawnHandler : IRoleSpawnHandler
     {

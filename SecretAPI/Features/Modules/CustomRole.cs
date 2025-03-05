@@ -17,7 +17,9 @@
         /// <inheritdoc />
         public int Id { get; } = ++Registry<ICustomRole>.CurrentId;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the spawn handler of the role.
+        /// </summary>
         public virtual IRoleSpawnHandler SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
 
         /// <inheritdoc />
