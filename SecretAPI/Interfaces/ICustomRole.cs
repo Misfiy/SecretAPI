@@ -18,6 +18,11 @@
         public int Id { get; }
 
         /// <summary>
+        /// Gets the spawn handler for the role.
+        /// </summary>
+        public IRoleSpawnHandler SpawnHandler { get; }
+
+        /// <summary>
         /// Adds the role to a player.
         /// </summary>
         /// <param name="player">Player to add to.</param>
