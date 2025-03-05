@@ -14,7 +14,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRoleSpawnHandler"/> class.
         /// </summary>
-        public DefaultRoleSpawnHandler()
+        private DefaultRoleSpawnHandler()
         {
             LabApi.Events.Handlers.PlayerEvents.ChangedRole += OnChangedRole;
         }
