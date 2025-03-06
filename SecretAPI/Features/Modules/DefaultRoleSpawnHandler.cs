@@ -11,7 +11,7 @@
     /// </summary>
     public class DefaultRoleSpawnHandler : IRoleSpawnHandler
     {
-        private List<ICustomRole> roles = [];
+        private readonly List<ICustomRole> roles = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRoleSpawnHandler"/> class.

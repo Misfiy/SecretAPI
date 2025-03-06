@@ -25,7 +25,7 @@
         /// <summary>
         /// Gets the spawn handler of the role.
         /// </summary>
-        public virtual IRoleSpawnHandler SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
+        public virtual IRoleSpawnHandler? SpawnHandler { get; } = DefaultRoleSpawnHandler.Instance;
 
         /// <summary>
         /// Registers the CustomRole.
@@ -61,7 +61,7 @@
         /// </summary>
         protected virtual void Init()
         {
-            SpawnHandler.AddRole(this);
+            SpawnHandler?.AddRole(this);
         }
 
         /// <summary>
