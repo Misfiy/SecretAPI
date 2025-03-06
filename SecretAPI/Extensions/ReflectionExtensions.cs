@@ -16,9 +16,9 @@
         /// <param name="value">The value it was cast to. Null if returned false.</param>
         /// <typeparam name="T">The type to attempt casting to.</typeparam>
         /// <returns>Whether the obj is T.</returns>
-        public static bool Is<T>(this object obj, out T value)
+        public static bool Is<T>(this object obj, [NotNullWhen(true)] out T? value)
         {
-            value = default!;
+            value = default;
 
             if (obj is not T cast)
                 return false;
