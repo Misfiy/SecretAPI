@@ -17,8 +17,8 @@
         /// <returns>A random value, default value when empty collection.</returns>
         public static T GetRandomValue<T>(this IEnumerable<T> collection)
         {
-            IList<T> array = collection as IList<T> ?? collection.ToList();
-            return array.ElementAt(Random.Range(0, array.Count));
+            IList<T> list = collection as IList<T> ?? collection.ToList();
+            return list[Random.Range(0, list.Count)];
         }
     }
 }
