@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using UnityEngine;
+    using Random = UnityEngine.Random;
 
     /// <summary>
     /// Extensions for collections.
@@ -17,8 +17,8 @@
         /// <returns>A random value, default value when empty collection.</returns>
         public static T GetRandomValue<T>(this IEnumerable<T> collection)
         {
-            T[] array = collection as T[] ?? collection.ToArray();
-            return array[Random.Range(0, array.Length)];
+            IList<T> array = collection as IList<T> ?? collection.ToList();
+            return array.ElementAt(Random.Range(0, array.Count));
         }
     }
 }
