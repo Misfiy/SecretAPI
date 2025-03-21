@@ -19,7 +19,7 @@
 
         /// <summary>
         /// Gets a list of types to register (Must inherit <see cref="StatusEffectBase"/>).
-        /// <remarks>Must be <see cref="Type"/>, can be gotten through e.g. typeof(Scp207).</remarks>
+        /// <remarks>Must be <see cref="Type"/>, can be gotten through <code>typeof(Scp207)</code></remarks>
         /// </summary>
         public static List<Type> EffectsToRegister { get; } = [];
 
