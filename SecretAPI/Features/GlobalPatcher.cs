@@ -3,6 +3,7 @@
     using System;
     using System.Reflection;
     using HarmonyLib;
+    using LabApi.Features.Console;
     using SecretAPI.Attribute;
 
     /// <summary>
@@ -11,42 +12,29 @@
     public static class GlobalPatcher
     {
         /// <summary>
-        /// 
+        /// Patches all.
         /// </summary>
-        /// <param name="harmony"></param>
-        /// <param name="assembly"></param>
-        /// <param name="category"></param>
+        /// <param name="harmony">The harmony to use for the patch.</param>
+        /// <param name="assembly">The assembly to look for patches.</param>
+        /// <param name="category">The category to patch. Null for all non categorized.</param>
         public static void PatchAll(Harmony harmony, Assembly? assembly = null, string? category = null)
         {
-            assembly ??= Assembly.GetEntryAssembly();
+            assembly ??= Assembly.GetCallingAssembly();
 
-            foreach (Type type in assembly.GetTypes())
+            try
             {
-                HarmonyPatchCategory categoryAttribute = type.GetCustomAttribute<HarmonyPatchCategory>();
-                if (categoryAttribute != null || categoryAttribute?.Category == category)
+                foreach (Type type in assembly.GetTypes())
                 {
-                    HarmonyPatchCondition patchCondition = type.GetCustomAttribute<HarmonyPatchCondition>();
-                    if (patchCondition != null && !patchCondition.CheckCondition())
+                    HarmonyPatchCategory categoryAttribute = type.GetCustomAttribute<HarmonyPatchCategory>();
+                    if ((category == null && categoryAttribute == null) || categoryAttribute.Category == category)
                     {
                         harmony.CreateClassProcessor(type).Patch();
                     }
-
-                    continue;
                 }
-
-                foreach (MethodInfo method in type.GetMethods())
-                {
-                    HarmonyPatchCategory methodCategoryAttribute = method.GetCustomAttribute<HarmonyPatchCategory>();
-                    HarmonyPatchCondition patchCondition = method.GetCustomAttribute<HarmonyPatchCondition>();
-
-                    if (methodCategoryAttribute?.Category != category)
-                        continue;
-
-                    if (patchCondition == null || patchCondition.CheckCondition())
-                    {
-                        harmony.CreateProcessor(method.GetBaseDefinition()).Patch();
-                    }
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.ToString());
             }
         }
     }
