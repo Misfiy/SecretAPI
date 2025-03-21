@@ -60,6 +60,9 @@
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
+            // NW won't validate unless the settings are defined.
+            ServerSpecificSettingsSync.DefinedSettings ??= CustomSettings.Select(s => s.Base).ToArray();
+
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.PermissionCheck == null || s.PermissionCheck(player));
             List<ServerSpecificSettingBase> ordered = [];
             foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
