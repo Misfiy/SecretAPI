@@ -14,6 +14,17 @@
         /// <summary>
         /// Patches all.
         /// </summary>
+        /// <param name="harmonyId">The harmony id to use for the patch.</param>
+        /// <param name="assembly">The assembly to look for patches.</param>
+        /// <param name="category">The category to patch. Null for all non categorized.</param>
+        public static void PatchAll(string harmonyId, Assembly? assembly = null, string? category = null)
+        {
+            PatchAll(new Harmony(harmonyId), assembly ?? Assembly.GetCallingAssembly(), category);
+        }
+
+        /// <summary>
+        /// Patches all.
+        /// </summary>
         /// <param name="harmony">The harmony to use for the patch.</param>
         /// <param name="assembly">The assembly to look for patches.</param>
         /// <param name="category">The category to patch. Null for all non categorized.</param>
