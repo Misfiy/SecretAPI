@@ -5,7 +5,7 @@
     /// <summary>
     /// Effect that disables stamina usage.
     /// </summary>
-    public class DisabledStaminaEffect : CustomPlayerEffect, IStaminaModifier
+    public class StaminaUsageDisablerEffect : CustomPlayerEffect, IStaminaModifier
     {
         /// <inheritdoc />
         public bool StaminaModifierActive => IsEnabled;
