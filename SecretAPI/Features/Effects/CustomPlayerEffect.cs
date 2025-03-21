@@ -44,6 +44,7 @@
         internal static void Initialize()
         {
             EffectsToRegister.Add(typeof(TemporaryDamageImmunity));
+            EffectsToRegister.Add(typeof(DisabledStaminaEffect));
 
             SceneManager.sceneLoaded += (_, _) =>
             {
