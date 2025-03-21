@@ -12,5 +12,8 @@
 
         /// <inheritdoc />
         public float StaminaUsageMultiplier => 0;
+
+        /// <inheritdoc />
+        public override EffectClassification Classification => EffectClassification.Positive;
     }
 }

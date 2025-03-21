@@ -12,5 +12,8 @@
 
         /// <inheritdoc />
         public bool SprintingDisabled => true;
+
+        /// <inheritdoc />
+        public override EffectClassification Classification => EffectClassification.Negative;
     }
 }
