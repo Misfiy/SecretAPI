@@ -4,6 +4,7 @@
     using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
+    using SecretAPI.Features;
     using SecretAPI.Features.Effects;
 
     /// <summary>
@@ -34,8 +35,8 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            harmony = new Harmony(nameof(SecretAPI) + DateTime.Now.Ticks);
-            harmony.PatchAll();
+            harmony = new Harmony("SecretAPI" + DateTime.Now);
+            GlobalPatcher.PatchAll(harmony, typeof(SecretApi).Assembly);
             CustomPlayerEffect.Initialize();
         }
 
