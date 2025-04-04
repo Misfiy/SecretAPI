@@ -21,6 +21,7 @@
         {
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
             LabApi.Events.Handlers.PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
+            LabApi.Events.Handlers.PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
             LabApi.Events.Handlers.PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
         }
@@ -109,6 +110,8 @@
         /// </summary>
         /// <param name="player">The player to update.</param>
         protected abstract void HandleSettingUpdate(Player player);
+
+        private static void RemoveStoredPlayer(Player player) => customSettings.Remove(player);
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
