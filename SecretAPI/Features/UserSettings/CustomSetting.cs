@@ -3,9 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using global::UserSettings.ServerSpecific;
-    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Interfaces;
@@ -141,9 +139,12 @@
 
             CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
 
-            NetworkWriter writer = new();
-            setting.Base.SerializeEntry(writer);
-            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(writer.buffer));
+            NetworkWriter entryWriter = new();
+            NetworkWriter valueWriter = new();
+            settingBase.SerializeEntry(entryWriter);
+            settingBase.SerializeValue(valueWriter);
+            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
+            newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
             newSettingPlayer.HandleSettingUpdate(player);
         }
 
