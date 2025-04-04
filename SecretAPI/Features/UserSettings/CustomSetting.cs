@@ -3,8 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using global::UserSettings.ServerSpecific;
+    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
+    using Mirror;
     using SecretAPI.Interfaces;
 
     /// <summary>
@@ -12,6 +15,8 @@
     /// </summary>
     public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
+        private static Dictionary<Player, List<CustomSetting>> customSettings = [];
+
         static CustomSetting()
         {
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
@@ -33,6 +38,11 @@
         /// Gets the registered custom settings.
         /// </summary>
         public static List<CustomSetting> CustomSettings { get; } = [];
+
+        /// <summary>
+        /// Gets a dictionary of player to their received custom settings.
+        /// </summary>
+        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => customSettings;
 
         /// <inheritdoc />
         public ServerSpecificSettingBase Base { get; }
@@ -111,16 +121,37 @@
 
         private static void OnSettingsUpdated(ReferenceHub hub, ServerSpecificSettingBase settingBase)
         {
-            Player player = Player.Get(hub);
-
             if (hub.IsHost)
                 return;
+
+            Player player = Player.Get(hub);
 
             CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
             if (setting == null || !setting.CanView(player))
                 return;
 
-            setting.HandleSettingUpdate(player);
+            CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
+
+            NetworkWriter writer = new();
+            setting.Base.SerializeEntry(writer);
+            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(writer.buffer));
+            newSettingPlayer.HandleSettingUpdate(player);
+        }
+
+        private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
+        {
+            List<CustomSetting> settings = customSettings.GetOrAdd(player, () => []);
+            CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
+            if (currentSetting == null)
+            {
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+                ConstructorInfo oldSettingConstructor = toMatch.GetType().GetConstructor(flags, null, [typeof(ServerSpecificSettingBase)], null) ?? throw new InvalidOperationException($"[CustomSetting] {toMatch.GetType().FullName} does not have a proper constructor! Requires length 1 & type of ServerSpecificSettingBase");
+                ServerSpecificSettingBase newSettingBase = ServerSpecificSettingsSync.CreateInstance(toMatch.Base.GetType());
+                currentSetting = (CustomSetting)oldSettingConstructor.Invoke([newSettingBase]);
+                settings.Add(currentSetting);
+            }
+
+            return currentSetting;
         }
     }
 }
