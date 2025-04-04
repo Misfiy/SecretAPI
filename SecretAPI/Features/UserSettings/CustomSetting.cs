@@ -87,7 +87,7 @@
                 return;
 
             CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
-            if (setting == null)
+            if (setting == null || !setting.CanView(player))
                 return;
 
             setting.HandleSettingUpdate(player);
