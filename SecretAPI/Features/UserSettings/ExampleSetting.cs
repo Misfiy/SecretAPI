@@ -30,6 +30,9 @@
         public override CustomHeader Header { get; } = new("Examples");
 
         /// <inheritdoc />
+        protected override CustomSetting CreateDuplicate() => new ExampleSetting();
+
+        /// <inheritdoc />
         protected override bool CanView(Player player) => true;
 
         /// <inheritdoc />

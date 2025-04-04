@@ -99,6 +99,12 @@
         protected virtual bool CanView(Player player) => true;
 
         /// <summary>
+        /// Creates a duplicate of the current setting.
+        /// </summary>
+        /// <returns>The duplicate setting created.</returns>
+        protected abstract CustomSetting CreateDuplicate();
+
+        /// <summary>
         /// Handles the updating of a setting.
         /// </summary>
         /// <param name="player">The player to update.</param>
@@ -144,10 +150,7 @@
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {
-                const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                ConstructorInfo oldSettingConstructor = toMatch.GetType().GetConstructor(flags, null, [typeof(ServerSpecificSettingBase)], null) ?? throw new InvalidOperationException($"[CustomSetting] {toMatch.GetType().FullName} does not have a proper constructor! Requires length 1 & type of ServerSpecificSettingBase");
-                ServerSpecificSettingBase newSettingBase = ServerSpecificSettingsSync.CreateInstance(toMatch.Base.GetType());
-                currentSetting = (CustomSetting)oldSettingConstructor.Invoke([newSettingBase]);
+                currentSetting = toMatch.CreateDuplicate();
                 settings.Add(currentSetting);
             }
 
