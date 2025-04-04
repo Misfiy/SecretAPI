@@ -43,6 +43,24 @@
         public abstract CustomHeader Header { get; }
 
         /// <summary>
+        /// Gets or sets the current label.
+        /// </summary>
+        public string Label
+        {
+            get => Base.Label;
+            set => Base.Label = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the current id.
+        /// </summary>
+        public int Id
+        {
+            get => Base.SettingId;
+            set => Base.SettingId = value;
+        }
+
+        /// <summary>
         /// Registers a collection of settings.
         /// </summary>
         /// <param name="settings">The settings to register.</param>

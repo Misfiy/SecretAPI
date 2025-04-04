@@ -6,6 +6,7 @@
     /// <summary>
     /// Wraps <see cref="SSGroupHeader"/>.
     /// </summary>
+    // Do not inherit CustomSetting, it can break things.
     public class CustomHeader : ISetting<SSGroupHeader>
     {
         /// <summary>

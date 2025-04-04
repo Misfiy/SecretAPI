@@ -1,10 +1,11 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
+    using System;
     using global::UserSettings.ServerSpecific;
     using SecretAPI.Interfaces;
 
     /// <summary>
-    /// <see cref="SSButton"/> wrapper. Make this proper.
+    /// Wraps <see cref="SSButton"/>.
     /// </summary>
     public abstract class CustomButtonSetting : CustomSetting, ISetting<SSButton>
     {
@@ -24,5 +25,28 @@
 
         /// <inheritdoc/>
         public new SSButton Base { get; }
+
+        /// <summary>
+        /// Gets the <see cref="TimeSpan"/> of the last press.
+        /// </summary>
+        public TimeSpan LastPress => Base.SyncLastPress.Elapsed;
+
+        /// <summary>
+        /// Gets or sets the text of the button.
+        /// </summary>
+        public string Text
+        {
+            get => Base.ButtonText;
+            set => Base.ButtonText = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the amount of time to hold the button in seconds.
+        /// </summary>
+        public float HoldTime
+        {
+            get => Base.HoldTimeSeconds;
+            set => Base.HoldTimeSeconds = value;
+        }
     }
 }
