@@ -10,7 +10,7 @@
     /// </summary>
     public static class RoomExtensions
     {
-        private static readonly List<RoomName> StupidRooms =
+        private static readonly List<RoomName> KnownUnsafeRooms =
         [
             RoomName.HczTesla, // Instant death
             RoomName.EzEvacShelter, // Stuck permanently
@@ -30,7 +30,7 @@
             if (Decontamination.IsDecontaminating && room.Zone == FacilityZone.LightContainment)
                 return false;
 
-            if (StupidRooms.Contains(room.Name))
+            if (KnownUnsafeRooms.Contains(room.Name))
                 return false;
 
             return Physics.Raycast(room.Position, Vector3.down, out _, 2);
