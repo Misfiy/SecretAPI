@@ -43,6 +43,7 @@
         /// </summary>
         internal static void Initialize()
         {
+            SecretApi.Harmony?.PatchCategory(nameof(CustomPlayerEffect), SecretApi.Assembly);
             EffectsToRegister.Add(typeof(TemporaryDamageImmunity));
             EffectsToRegister.Add(typeof(StaminaUsageDisablerEffect));
             EffectsToRegister.Add(typeof(SprintDisablerEffect));
