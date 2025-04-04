@@ -1,6 +1,5 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using global::UserSettings.ServerSpecific;
@@ -10,7 +9,7 @@
     /// <summary>
     /// Wraps <see cref="ServerSpecificSettingBase"/>.
     /// </summary>
-    public class CustomSetting : ISetting<ServerSpecificSettingBase>
+    public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
         static CustomSetting()
         {
@@ -24,15 +23,9 @@
         /// Initializes a new instance of the <see cref="CustomSetting"/> class.
         /// </summary>
         /// <param name="setting">The setting to use for custom setting.</param>
-        /// <param name="header">The header to use.</param>
-        /// <param name="onChanged">What to do when setting changes.</param>
-        /// <param name="permissionCheck">The check for handling permissions. Null for no check needed.</param>
-        public CustomSetting(ServerSpecificSettingBase setting, CustomHeader header, Action<Player, CustomSetting> onChanged, Predicate<Player>? permissionCheck = null)
+        protected CustomSetting(ServerSpecificSettingBase setting)
         {
             Base = setting;
-            Header = header;
-            OnChanged = onChanged;
-            PermissionCheck = permissionCheck;
         }
 
         /// <summary>
@@ -46,21 +39,36 @@
         /// <summary>
         /// Gets the <see cref="CustomHeader"/> of the setting.
         /// </summary>
-        public CustomHeader Header { get; }
+        public abstract CustomHeader Header { get; }
 
         /// <summary>
-        /// Gets the func to validate permission on the player.
+        /// Registers a collection of settings.
         /// </summary>
-        public Predicate<Player>? PermissionCheck { get; }
+        /// <param name="settings">The settings to register.</param>
+        public static void Register(params CustomSetting[] settings) => CustomSettings.AddRange(settings);
 
         /// <summary>
-        /// Gets the action to do on changes.
+        /// Registers a collection of settings.
         /// </summary>
-        public Action<Player, CustomSetting> OnChanged { get; }
+        /// <param name="settings">The settings to register.</param>
+        public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+
+        /// <summary>
+        /// Checks if a player is able to view a setting.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <returns>A value indicating whether a player is able to view the setting.</returns>
+        protected virtual bool CanView(Player player) => true;
+
+        /// <summary>
+        /// Handles the updating of a setting.
+        /// </summary>
+        /// <param name="player">The player to update.</param>
+        protected abstract void HandleSettingUpdate(Player player);
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
-            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.PermissionCheck == null || s.PermissionCheck(player));
+            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
             List<ServerSpecificSettingBase> ordered = [];
             foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
             {
@@ -82,7 +90,7 @@
             if (setting == null)
                 return;
 
-            setting.OnChanged(player, setting);
+            setting.HandleSettingUpdate(player);
         }
     }
 }
