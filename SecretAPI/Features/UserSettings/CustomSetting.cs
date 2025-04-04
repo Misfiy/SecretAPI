@@ -5,6 +5,7 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Features.Wrappers;
+    using Mirror;
     using SecretAPI.Interfaces;
 
     /// <summary>
@@ -12,10 +13,13 @@
     /// </summary>
     public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
+        private static Dictionary<Player, List<CustomSetting>> customSettings = [];
+
         static CustomSetting()
         {
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
             LabApi.Events.Handlers.PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
+            LabApi.Events.Handlers.PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
             LabApi.Events.Handlers.PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
         }
@@ -33,6 +37,11 @@
         /// Gets the registered custom settings.
         /// </summary>
         public static List<CustomSetting> CustomSettings { get; } = [];
+
+        /// <summary>
+        /// Gets a dictionary of player to their received custom settings.
+        /// </summary>
+        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => customSettings;
 
         /// <inheritdoc />
         public ServerSpecificSettingBase Base { get; }
@@ -89,10 +98,18 @@
         protected virtual bool CanView(Player player) => true;
 
         /// <summary>
+        /// Creates a duplicate of the current setting.
+        /// </summary>
+        /// <returns>The duplicate setting created.</returns>
+        protected abstract CustomSetting CreateDuplicate();
+
+        /// <summary>
         /// Handles the updating of a setting.
         /// </summary>
         /// <param name="player">The player to update.</param>
         protected abstract void HandleSettingUpdate(Player player);
+
+        private static void RemoveStoredPlayer(Player player) => customSettings.Remove(player);
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
@@ -111,16 +128,37 @@
 
         private static void OnSettingsUpdated(ReferenceHub hub, ServerSpecificSettingBase settingBase)
         {
-            Player player = Player.Get(hub);
-
             if (hub.IsHost)
                 return;
+
+            Player player = Player.Get(hub);
 
             CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
             if (setting == null || !setting.CanView(player))
                 return;
 
-            setting.HandleSettingUpdate(player);
+            CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
+
+            NetworkWriter entryWriter = new();
+            NetworkWriter valueWriter = new();
+            settingBase.SerializeEntry(entryWriter);
+            settingBase.SerializeValue(valueWriter);
+            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
+            newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+            newSettingPlayer.HandleSettingUpdate(player);
+        }
+
+        private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
+        {
+            List<CustomSetting> settings = customSettings.GetOrAdd(player, () => []);
+            CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
+            if (currentSetting == null)
+            {
+                currentSetting = toMatch.CreateDuplicate();
+                settings.Add(currentSetting);
+            }
+
+            return currentSetting;
         }
     }
 }
