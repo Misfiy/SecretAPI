@@ -16,16 +16,6 @@
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExampleSetting"/> class.
-        /// </summary>
-        /// <param name="setting">The setting.</param>
-        // Required for CustomSetting to work.
-        public ExampleSetting(ServerSpecificSettingBase setting)
-            : base((setting as SSButton)!)
-        {
-        }
-
         /// <inheritdoc />
         public override CustomHeader Header { get; } = new("Examples");
 
