@@ -1,6 +1,5 @@
 ﻿namespace SecretAPI.Patches.Features
 {
-    using System.Linq;
     using HarmonyLib;
     using SecretAPI.Features.UserSettings;
     using UserSettings.ServerSpecific;
@@ -18,11 +17,7 @@
             if (__result)
                 return;
 
-            CustomSetting? setting =
-                CustomSetting.CustomSettings.
-                    FirstOrDefault(s => s.Base.SettingId == msg.Id && s.Base.GetType() == msg.SettingType);
-
-            __result = setting != null;
+            __result = CustomSetting.Get(msg.SettingType, msg.Id) != null;
         }
     }
 }

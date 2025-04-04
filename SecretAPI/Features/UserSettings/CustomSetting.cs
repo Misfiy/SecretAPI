@@ -1,5 +1,6 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using global::UserSettings.ServerSpecific;
@@ -52,6 +53,15 @@
         /// </summary>
         /// <param name="settings">The settings to register.</param>
         public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+
+        /// <summary>
+        /// Gets a <see cref="CustomSetting"/>, used for validation.
+        /// </summary>
+        /// <param name="type">The type of the base setting.</param>
+        /// <param name="id">The id of the setting.</param>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static CustomSetting? Get(Type type, int id)
+            => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.Base.GetType() == type);
 
         /// <summary>
         /// Checks if a player is able to view a setting.
