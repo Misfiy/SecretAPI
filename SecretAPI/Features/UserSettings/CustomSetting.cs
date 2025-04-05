@@ -13,7 +13,7 @@
     /// </summary>
     public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
-        private static Dictionary<Player, List<CustomSetting>> customSettings = [];
+        private static Dictionary<Player, List<CustomSetting>> receivedPlayerSettings = [];
 
         static CustomSetting()
         {
@@ -41,7 +41,7 @@
         /// <summary>
         /// Gets a dictionary of player to their received custom settings.
         /// </summary>
-        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => customSettings;
+        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => receivedPlayerSettings;
 
         /// <inheritdoc />
         public ServerSpecificSettingBase Base { get; }
@@ -109,7 +109,7 @@
         /// <param name="player">The player to update.</param>
         protected abstract void HandleSettingUpdate(Player player);
 
-        private static void RemoveStoredPlayer(Player player) => customSettings.Remove(player);
+        private static void RemoveStoredPlayer(Player player) => receivedPlayerSettings.Remove(player);
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
@@ -150,7 +150,7 @@
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
         {
-            List<CustomSetting> settings = customSettings.GetOrAdd(player, () => []);
+            List<CustomSetting> settings = receivedPlayerSettings.GetOrAdd(player, () => []);
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {
