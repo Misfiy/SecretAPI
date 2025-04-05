@@ -1,17 +1,18 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
     using LabApi.Features.Wrappers;
+    using UnityEngine;
 
     /// <summary>
     /// Example setting to use during testing.
     /// </summary>
-    public class ExampleSetting : CustomButtonSetting
+    public class ExampleSetting : CustomKeybindSetting
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleSetting"/> class.
         /// </summary>
         public ExampleSetting()
-            : base(1, "Example Kill Button", "Kill")
+            : base(900, "Example Kill Button", KeyCode.G)
         {
         }
 
