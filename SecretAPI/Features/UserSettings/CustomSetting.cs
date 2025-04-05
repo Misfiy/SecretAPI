@@ -6,6 +6,7 @@
     using global::UserSettings.ServerSpecific;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using SecretAPI.Extensions;
     using SecretAPI.Interfaces;
 
     /// <summary>
@@ -17,6 +18,8 @@
 
         static CustomSetting()
         {
+            SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
+
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
             LabApi.Events.Handlers.PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
             LabApi.Events.Handlers.PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);

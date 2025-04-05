@@ -1,12 +1,14 @@
 ﻿namespace SecretAPI.Patches.Features
 {
     using HarmonyLib;
+    using SecretAPI.Attribute;
     using SecretAPI.Features.UserSettings;
     using UserSettings.ServerSpecific;
 
     /// <summary>
     /// Fixes validation for <see cref="CustomSetting"/>.
     /// </summary>
+    [HarmonyPatchCategory(nameof(CustomSetting))]
     [HarmonyPatch(typeof(ServerSpecificSettingsSync), nameof(ServerSpecificSettingsSync.ServerPrevalidateClientResponse))]
     internal static class SettingsSyncValidateFix
     {

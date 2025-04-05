@@ -1,12 +1,14 @@
 ﻿namespace SecretAPI.Patches.Features
 {
     using HarmonyLib;
+    using SecretAPI.Attribute;
     using SecretAPI.Features.UserSettings;
     using UserSettings.ServerSpecific;
 
     /// <summary>
     /// Fixes <see cref="ServerSpecificSettingBase.OriginalDefinition"/> on custom settings.
     /// </summary>
+    [HarmonyPatchCategory(nameof(CustomSetting))]
     [HarmonyPatch(typeof(ServerSpecificSettingBase), nameof(ServerSpecificSettingBase.OriginalDefinition), MethodType.Getter)]
     internal static class SettingsOriginalDefinitionFix
     {
