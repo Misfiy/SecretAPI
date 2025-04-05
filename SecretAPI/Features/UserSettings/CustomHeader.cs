@@ -6,7 +6,6 @@
     /// <summary>
     /// Wraps <see cref="SSGroupHeader"/>.
     /// </summary>
-    // Do not inherit CustomSetting, it can break things.
     public class CustomHeader : ISetting<SSGroupHeader>
     {
         /// <summary>
@@ -19,6 +18,16 @@
         {
             Base = new SSGroupHeader(label, reducedPadding, hint);
         }
+
+        /// <summary>
+        /// Gets a <see cref="CustomHeader"/> for Gameplay purposes.
+        /// </summary>
+        public static CustomHeader Gameplay { get; } = new("Gameplay");
+
+        /// <summary>
+        /// Gets a <see cref="CustomHeader"/> for Example purposes.
+        /// </summary>
+        public static CustomHeader Examples { get; } = new("Examples");
 
         /// <inheritdoc />
         public SSGroupHeader Base { get; }

@@ -1,6 +1,5 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
-    using global::UserSettings.ServerSpecific;
     using LabApi.Features.Wrappers;
 
     /// <summary>
@@ -17,13 +16,10 @@
         }
 
         /// <inheritdoc />
-        public override CustomHeader Header { get; } = new("Examples");
+        public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc />
         protected override CustomSetting CreateDuplicate() => new ExampleSetting();
-
-        /// <inheritdoc />
-        protected override bool CanView(Player player) => true;
 
         /// <inheritdoc />
         protected override void HandleSettingUpdate(Player player)
