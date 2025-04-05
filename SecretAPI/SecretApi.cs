@@ -5,7 +5,7 @@
     using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
-    using SecretAPI.Features;
+    using SecretAPI.Extensions;
     using SecretAPI.Features.Effects;
 
     /// <summary>

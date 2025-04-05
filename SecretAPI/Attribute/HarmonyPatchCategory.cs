@@ -1,10 +1,10 @@
 ﻿namespace SecretAPI.Attribute
 {
     using System;
-    using SecretAPI.Features;
+    using SecretAPI.Extensions;
 
     /// <summary>
-    /// Category handling for <see cref="GlobalPatcher"/>.
+    /// Category handling for <see cref="HarmonyExtensions"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class HarmonyPatchCategory : Attribute

@@ -1,4 +1,4 @@
-﻿namespace SecretAPI.Features
+﻿namespace SecretAPI.Extensions
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@
     /// <summary>
     /// Handles patching.
     /// </summary>
-    public static class GlobalPatcher
+    public static class HarmonyExtensions
     {
         /// <summary>
         /// Patches all methods with the proper <see cref="HarmonyPatchCategory"/>.

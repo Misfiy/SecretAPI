@@ -5,6 +5,7 @@
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using SecretAPI.Extensions;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using Logger = LabApi.Features.Console.Logger;
