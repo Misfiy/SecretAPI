@@ -22,8 +22,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomButtonSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the button.</param>
-        /// <param name="label">The label of the button.</param>
+        /// <param name="id">The ID of the button.</param>
+        /// <param name="label">The setting's label.</param>
         /// <param name="buttonText">The button text.</param>
         /// <param name="holdTimeSeconds">The time to hold.</param>
         /// <param name="hint">The hint to show.</param>

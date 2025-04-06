@@ -21,8 +21,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomDropdownSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the setting.</param>
-        /// <param name="label">The label of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="label">The setting's label.</param>
         /// <param name="options">The array of string options to give.</param>
         /// <param name="defaultOptionIndex">The default option (int index).</param>
         /// <param name="entryType">The entry type.</param>
