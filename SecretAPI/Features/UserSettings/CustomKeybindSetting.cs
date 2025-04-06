@@ -22,11 +22,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomKeybindSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the setting.</param>
-        /// <param name="label">The label of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="label">The setting's label.</param>
         /// <param name="suggestedKey">The suggested key.</param>
         /// <param name="preventInteractionOnGui">Whether to prevent interaction in a GUI.</param>
-        /// <param name="hint">The hint to display.</param>
+        /// <param name="hint">The hint to show.</param>
         protected CustomKeybindSetting(
             int? id,
             string label,
