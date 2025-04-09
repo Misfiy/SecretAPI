@@ -5,7 +5,7 @@
     using TMPro;
 
     /// <summary>
-    /// Plain text setting.
+    /// Wrapper for <see cref="SSTextArea"/>.
     /// </summary>
     public abstract class CustomTextAreaSetting : CustomSetting, ISetting<SSTextArea>
     {
@@ -22,7 +22,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomTextAreaSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
         /// <param name="content">The content of the setting.</param>
         /// <param name="foldoutMode">The foldout mode.</param>
         /// <param name="collapsedText">The collapsed text.</param>

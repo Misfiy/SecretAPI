@@ -5,7 +5,7 @@
     using TMPro;
 
     /// <summary>
-    /// Plain text setting.
+    /// Wrapper for <see cref="SSPlaintextSetting" />.
     /// </summary>
     public abstract class CustomPlainTextSetting : CustomSetting, ISetting<SSPlaintextSetting>
     {
@@ -22,8 +22,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomPlainTextSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the setting.</param>
-        /// <param name="label">The label of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="label">The setting's label.</param>
         /// <param name="placeholder">The placeholder to use for the setting.</param>
         /// <param name="characterLimit">The max allowed characters.</param>
         /// <param name="contentType">The content type.</param>
