@@ -6,7 +6,7 @@
     /// <summary>
     /// Example setting to use during testing.
     /// </summary>
-    public class ExampleSetting : CustomKeybindSetting
+    internal class ExampleSetting : CustomKeybindSetting
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleSetting"/> class.
