@@ -4,7 +4,7 @@
     using SecretAPI.Interfaces;
 
     /// <summary>
-    /// Plain text setting. TODO: Consider CustomIntSliderSetting and CustomFloatSliderSetting.
+    /// Wrapper for <see cref="SSSliderSetting"/>.
     /// </summary>
     public abstract class CustomSliderSetting : CustomSetting, ISetting<SSSliderSetting>
     {
@@ -21,8 +21,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomSliderSetting"/> class.
         /// </summary>
-        /// <param name="id">The id of the setting.</param>
-        /// <param name="label">The label of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="label">The setting's label.</param>
         /// <param name="minValue">The slider's minimum value.</param>
         /// <param name="maxValue">The slider's maximum value.</param>
         /// <param name="defaultValue">The default value for the slider.</param>
