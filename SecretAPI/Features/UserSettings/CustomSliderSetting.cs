@@ -1,0 +1,59 @@
+﻿namespace SecretAPI.Features.UserSettings
+{
+    using global::UserSettings.ServerSpecific;
+    using SecretAPI.Interfaces;
+
+    /// <summary>
+    /// Plain text setting. TODO: Consider CustomIntSliderSetting & CustomFloatSliderSetting.
+    /// </summary>
+    public abstract class CustomSliderSetting : CustomSetting, ISetting<SSSliderSetting>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomSliderSetting"/> class.
+        /// </summary>
+        /// <param name="setting">The setting to wrap.</param>
+        protected CustomSliderSetting(SSSliderSetting setting)
+            : base(setting)
+        {
+            Base = setting;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomSliderSetting"/> class.
+        /// </summary>
+        /// <param name="id">The id of the setting.</param>
+        /// <param name="label">The label of the setting.</param>
+        /// <param name="minValue">The slider's minimum value.</param>
+        /// <param name="maxValue">The slider's maximum value.</param>
+        /// <param name="defaultValue">The default value for the slider.</param>
+        /// <param name="integer">Whether it should be an integer (false for float).</param>
+        /// <param name="valueToStringFormat">Value to string format.</param>
+        /// <param name="finalDisplayFormat">The final display format.</param>
+        /// <param name="hint">The hint to display.</param>
+        protected CustomSliderSetting(
+            int? id,
+            string label,
+            float minValue,
+            float maxValue,
+            float defaultValue = 0.0f,
+            bool integer = false,
+            string valueToStringFormat = "0.##",
+            string finalDisplayFormat = "{0}",
+            string? hint = null)
+            : this(new SSSliderSetting(id, label, minValue, maxValue, defaultValue, integer, valueToStringFormat, finalDisplayFormat, hint))
+        {
+        }
+
+        /// <inheritdoc/>
+        public new SSSliderSetting Base { get; }
+
+        /// <summary>
+        /// Gets or sets the synced value selected.
+        /// </summary>
+        public float SelectedValue
+        {
+            get => Base.SyncFloatValue;
+            set => Base.SyncFloatValue = value;
+        }
+    }
+}
