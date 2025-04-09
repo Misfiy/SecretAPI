@@ -4,7 +4,7 @@
     using SecretAPI.Interfaces;
 
     /// <summary>
-    /// Plain text setting. TODO: Consider CustomIntSliderSetting & CustomFloatSliderSetting.
+    /// Plain text setting. TODO: Consider CustomIntSliderSetting and CustomFloatSliderSetting.
     /// </summary>
     public abstract class CustomSliderSetting : CustomSetting, ISetting<SSSliderSetting>
     {
