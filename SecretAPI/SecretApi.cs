@@ -1,9 +1,11 @@
 ﻿namespace SecretAPI
 {
     using System;
+    using System.Reflection;
     using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
+    using SecretAPI.Extensions;
     using SecretAPI.Features.Effects;
 
     /// <summary>
@@ -11,8 +13,6 @@
     /// </summary>
     public class SecretApi : Plugin
     {
-        private Harmony? harmony;
-
         /// <inheritdoc/>
         public override string Name => "SecretAPI";
 
@@ -29,20 +29,30 @@
         public override Version Version { get; } = typeof(SecretApi).Assembly.GetName().Version;
 
         /// <inheritdoc/>
-        public override Version RequiredApiVersion => new(1, 0, 0);
+        public override Version RequiredApiVersion { get; } = new(LabApi.Features.LabApiProperties.CompiledVersion);
+
+        /// <summary>
+        /// Gets the harmony to use for the API.
+        /// </summary>
+        internal static Harmony? Harmony { get; private set; }
+
+        /// <summary>
+        /// Gets the Assembly of the API.
+        /// </summary>
+        internal static Assembly Assembly { get; } = typeof(SecretApi).Assembly;
 
         /// <inheritdoc/>
         public override void Enable()
         {
-            harmony = new Harmony(nameof(SecretAPI) + DateTime.Now.Ticks);
-            harmony.PatchAll();
+            Harmony = new Harmony("SecretAPI" + DateTime.Now);
+            Harmony.PatchAllNoCategory(Assembly);
             CustomPlayerEffect.Initialize();
         }
 
         /// <inheritdoc/>
         public override void Disable()
         {
-            harmony?.UnpatchAll(harmony.Id);
+            Harmony?.UnpatchAll(Harmony.Id);
         }
     }
 }

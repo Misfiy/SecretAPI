@@ -4,11 +4,13 @@
     using HarmonyLib;
     using LabApi.Features.Wrappers;
     using PlayerStatsSystem;
+    using SecretAPI.Attribute;
     using SecretAPI.Features.Effects;
 
     /// <summary>
     /// Implements <see cref="IAttackDamageModiferEffect"/>.
     /// </summary>
+    [HarmonyPatchCategory(nameof(CustomPlayerEffect))]
     [HarmonyPatch(typeof(AttackerDamageHandler), nameof(AttackerDamageHandler.ProcessDamage))]
     internal static class DamageAttackMultiplier
     {

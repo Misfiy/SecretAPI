@@ -5,6 +5,7 @@
     using CustomPlayerEffects;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using SecretAPI.Extensions;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using Logger = LabApi.Features.Console.Logger;
@@ -36,13 +37,15 @@
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"{GetType().FullName}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
+        public override string ToString() => $"{GetType().Name}: Owner ({Owner}) - Intensity ({Intensity}) - Duration {Duration}";
 
         /// <summary>
         /// Initializes the <see cref="CustomPlayerEffect"/> to implement <see cref="EffectsToRegister"/>.
         /// </summary>
         internal static void Initialize()
         {
+            SecretApi.Harmony?.PatchCategory(nameof(CustomPlayerEffect), SecretApi.Assembly);
+            IGravityEffect.Initialize();
             EffectsToRegister.Add(typeof(TemporaryDamageImmunity));
             EffectsToRegister.Add(typeof(StaminaUsageDisablerEffect));
             EffectsToRegister.Add(typeof(SprintDisablerEffect));
@@ -54,7 +57,7 @@
 
                 isLoaded = true;
 
-                Transform playerEffects = NetworkManager.singleton.playerPrefab.GetComponent<PlayerEffectsController>().transform;
+                Transform playerEffects = NetworkManager.singleton.playerPrefab.GetComponent<PlayerEffectsController>().effectsGameObject.transform;
                 foreach (Type type in EffectsToRegister)
                 {
                     if (!typeof(StatusEffectBase).IsAssignableFrom(type))
