@@ -16,7 +16,7 @@
         protected CustomKeybindSetting(SSKeybindSetting setting)
             : base(setting)
         {
-            Base = (SSKeybindSetting)base.Base;
+            Base = setting;
         }
 
         /// <summary>

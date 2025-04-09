@@ -1,8 +1,7 @@
-﻿namespace SecretAPITest
+﻿namespace SecretAPI.Features.UserSettings
 {
-    using SecretAPI.Features.UserSettings;
+    using global::UserSettings.ServerSpecific;
     using SecretAPI.Interfaces;
-    using UserSettings.ServerSpecific;
 
     /// <summary>
     /// Wrapper for <see cref="SSTwoButtonsSetting"/>.
@@ -16,7 +15,7 @@
         protected CustomTwoButtonSetting(SSTwoButtonsSetting button)
             : base(button)
         {
-            Base = (SSTwoButtonsSetting)base.Base;
+            Base = button;
         }
 
         /// <summary>
@@ -29,7 +28,7 @@
         /// <param name="defaultIsB">Whether the second option should be default. Default: false.</param>
         /// <param name="hint">The hint to show.</param>
         protected CustomTwoButtonSetting(int? id, string label, string optionA, string optionB, bool defaultIsB = false, string? hint = null)
-            : this(new(id, label, optionA, optionB, defaultIsB, hint))
+            : this(new SSTwoButtonsSetting(id, label, optionA, optionB, defaultIsB, hint))
         {
         }
 

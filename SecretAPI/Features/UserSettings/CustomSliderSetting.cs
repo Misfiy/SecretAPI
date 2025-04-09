@@ -48,12 +48,40 @@
         public new SSSliderSetting Base { get; }
 
         /// <summary>
-        /// Gets or sets the synced value selected.
+        /// Gets the synced value selected as a float.
         /// </summary>
-        public float SelectedValue
+        public float SelectedValueFloat => Base.SyncFloatValue;
+
+        /// <summary>
+        /// Gets the synced value selected as an integer.
+        /// </summary>
+        public int SelectedValueInt => Base.SyncIntValue;
+
+        /// <summary>
+        /// Gets or sets the minimum value of the setting.
+        /// </summary>
+        public float MinimumValue
         {
-            get => Base.SyncFloatValue;
-            set => Base.SyncFloatValue = value;
+            get => Base.MinValue;
+            set => Base.MinValue = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum value of the setting.
+        /// </summary>
+        public float MaximumValue
+        {
+            get => Base.MaxValue;
+            set => Base.MaxValue = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the default value of the setting.
+        /// </summary>
+        public float DefaultValue
+        {
+            get => Base.DefaultValue;
+            set => Base.DefaultValue = value;
         }
     }
 }

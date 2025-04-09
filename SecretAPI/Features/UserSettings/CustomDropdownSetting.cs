@@ -15,7 +15,7 @@
         protected CustomDropdownSetting(SSDropdownSetting setting)
             : base(setting)
         {
-            Base = (SSDropdownSetting)base.Base;
+            Base = setting;
         }
 
         /// <summary>

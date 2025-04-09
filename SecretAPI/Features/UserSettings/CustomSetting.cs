@@ -14,7 +14,7 @@
     /// </summary>
     public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
-        private static Dictionary<Player, List<CustomSetting>> receivedPlayerSettings = [];
+        private static readonly Dictionary<Player, List<CustomSetting>> ReceivedPlayerSettings = [];
 
         static CustomSetting()
         {
@@ -44,7 +44,7 @@
         /// <summary>
         /// Gets a dictionary of player to their received custom settings.
         /// </summary>
-        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => receivedPlayerSettings;
+        public static IReadOnlyDictionary<Player, List<CustomSetting>> PlayerSettings => ReceivedPlayerSettings;
 
         /// <inheritdoc />
         public ServerSpecificSettingBase Base { get; }
@@ -101,7 +101,7 @@
         protected virtual bool CanView(Player player) => true;
 
         /// <summary>
-        /// Creates a duplicate of the current setting.
+        /// Creates a duplicate of the current setting. Used to properly sync values and implement <see cref="PlayerSettings"/>.
         /// </summary>
         /// <returns>The duplicate setting created.</returns>
         protected abstract CustomSetting CreateDuplicate();
@@ -112,7 +112,7 @@
         /// <param name="player">The player to update.</param>
         protected abstract void HandleSettingUpdate(Player player);
 
-        private static void RemoveStoredPlayer(Player player) => receivedPlayerSettings.Remove(player);
+        private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
 
         private static void SendSettingsToPlayer(Player player, int version = 1)
         {
@@ -153,7 +153,7 @@
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
         {
-            List<CustomSetting> settings = receivedPlayerSettings.GetOrAdd(player, () => []);
+            List<CustomSetting> settings = ReceivedPlayerSettings.GetOrAdd(player, () => []);
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {

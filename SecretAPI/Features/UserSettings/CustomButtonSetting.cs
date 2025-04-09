@@ -16,7 +16,7 @@
         protected CustomButtonSetting(SSButton button)
             : base(button)
         {
-            Base = (SSButton)base.Base;
+            Base = button;
         }
 
         /// <summary>
