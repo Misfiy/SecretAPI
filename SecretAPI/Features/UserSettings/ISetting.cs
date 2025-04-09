@@ -1,6 +1,6 @@
-﻿namespace SecretAPI.Interfaces
+﻿namespace SecretAPI.Features.UserSettings
 {
-    using UserSettings.ServerSpecific;
+    using global::UserSettings.ServerSpecific;
 
     /// <summary>
     /// Handles <see cref="ServerSpecificSettingBase"/>.

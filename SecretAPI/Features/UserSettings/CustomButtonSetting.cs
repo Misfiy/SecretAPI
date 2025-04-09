@@ -2,7 +2,6 @@
 {
     using System;
     using global::UserSettings.ServerSpecific;
-    using SecretAPI.Interfaces;
 
     /// <summary>
     /// Wraps <see cref="SSButton"/>.

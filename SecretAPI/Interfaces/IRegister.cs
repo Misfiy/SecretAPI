@@ -4,7 +4,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// Interface used to define a type that should auto register.
+    /// Interface used to define a type that should auto register. TODO: Move to Features.
     /// </summary>
     public interface IRegister
     {

@@ -1,7 +1,6 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
     using global::UserSettings.ServerSpecific;
-    using SecretAPI.Interfaces;
 
     /// <summary>
     /// Wrapper for <see cref="SSTwoButtonsSetting"/>.

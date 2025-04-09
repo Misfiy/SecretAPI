@@ -29,7 +29,7 @@
         public override Version Version { get; } = typeof(SecretApi).Assembly.GetName().Version;
 
         /// <inheritdoc/>
-        public override Version RequiredApiVersion => new(1, 0, 0);
+        public override Version RequiredApiVersion { get; } = new(LabApi.Features.LabApiProperties.CompiledVersion);
 
         /// <summary>
         /// Gets the harmony to use for the API.

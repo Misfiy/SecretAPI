@@ -7,7 +7,6 @@
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Extensions;
-    using SecretAPI.Interfaces;
 
     /// <summary>
     /// Wraps <see cref="ServerSpecificSettingBase"/>.
