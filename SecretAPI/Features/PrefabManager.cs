@@ -33,6 +33,11 @@
         public static PrimitiveObjectToy? PrimitiveObjectToy { get; private set; }
 
         /// <summary>
+        /// Gets the prefab for <see cref="LightSourceToy"/>.
+        /// </summary>
+        public static LightSourceToy? LightSourceToy { get; private set; }
+
+        /// <summary>
         /// Initializes the prefab manager.
         /// </summary>
         internal static void Initialize()
@@ -64,6 +69,12 @@
             if (gameObject.TryGetComponent(out PrimitiveObjectToy primitiveObjectToy))
             {
                 PrimitiveObjectToy = primitiveObjectToy;
+                return;
+            }
+
+            if (gameObject.TryGetComponent(out LightSourceToy lightSourceToy))
+            {
+                LightSourceToy = lightSourceToy;
                 return;
             }
         }
