@@ -47,8 +47,8 @@
                 foreach (KeyValuePair<uint, GameObject> pair in NetworkClient.prefabs)
                     CheckGameObject(pair.Value);
 
-                foreach (BasicRagdoll? pair in RagdollManager.AllRagdolls)
-                    CheckGameObject(pair.gameObject);
+                foreach (NetworkIdentity identity in RagdollManager.AllRagdollPrefabs)
+                    CheckGameObject(identity.gameObject);
             };
         }
 
