@@ -2,6 +2,8 @@
 {
     using System;
     using LabApi.Loader.Features.Plugins;
+    using SecretAPI.Examples.Settings;
+    using SecretAPI.Features.UserSettings;
 
     /// <summary>
     /// Defines the entry for the plugin.
@@ -26,6 +28,7 @@
         /// <inheritdoc/>
         public override void Enable()
         {
+            CustomSetting.Register(new ExampleKeybindSetting());
         }
 
         /// <inheritdoc/>
