@@ -6,6 +6,7 @@
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
     using SecretAPI.Extensions;
+    using SecretAPI.Features;
     using SecretAPI.Features.Effects;
 
     /// <summary>
@@ -46,6 +47,7 @@
         {
             Harmony = new Harmony("SecretAPI" + DateTime.Now);
             Harmony.PatchAllNoCategory(Assembly);
+            PrefabManager.Initialize();
             CustomPlayerEffect.Initialize();
         }
 
