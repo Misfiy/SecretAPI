@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI.Features
 {
     using System.Collections.Generic;
+    using AdminToys;
     using Mirror;
     using PlayerRoles.Ragdolls;
     using UnityEngine;
@@ -15,6 +16,21 @@
         /// Gets the prefab for players.
         /// </summary>
         public static GameObject PlayerPrefab => NetworkManager.singleton.playerPrefab;
+
+        /// <summary>
+        /// Gets the prefab for <see cref="CapybaraToy"/>.
+        /// </summary>
+        public static CapybaraToy? CapybaraToy { get; private set; }
+
+        /// <summary>
+        /// Gets the prefab for <see cref="SpeakerToy"/>.
+        /// </summary>
+        public static SpeakerToy? SpeakerToy { get; private set; }
+
+        /// <summary>
+        /// Gets the prefab for <see cref="PrimitiveObjectToy"/>.
+        /// </summary>
+        public static PrimitiveObjectToy? PrimitiveObjectToy { get; private set; }
 
         /// <summary>
         /// Initializes the prefab manager.
@@ -33,7 +49,23 @@
 
         private static void CheckGameObject(GameObject gameObject)
         {
-            // if (gameObject.TryGetComponent()))
+            if (gameObject.TryGetComponent(out CapybaraToy capybaraToy))
+            {
+                CapybaraToy = capybaraToy;
+                return;
+            }
+
+            if (gameObject.TryGetComponent(out SpeakerToy speakerToy))
+            {
+                SpeakerToy = speakerToy;
+                return;
+            }
+
+            if (gameObject.TryGetComponent(out PrimitiveObjectToy primitiveObjectToy))
+            {
+                PrimitiveObjectToy = primitiveObjectToy;
+                return;
+            }
         }
     }
 }
