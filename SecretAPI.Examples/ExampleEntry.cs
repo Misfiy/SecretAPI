@@ -12,7 +12,7 @@
     /// </summary>
     public class ExampleEntry : Plugin
     {
-        private Harmony? _harmony;
+        private Harmony? harmony;
 
         /// <inheritdoc/>
         public override string Name { get; } = "SecretAPI.Example";
@@ -33,9 +33,9 @@
         public override void Enable()
         {
             CustomSetting.Register(new ExampleKeybindSetting());
-            _harmony = new Harmony(nameof(ExampleEntry) + DateTime.Now.Ticks);
-            _harmony.PatchAllNoCategory();
-            _harmony.PatchCategory(nameof(ExampleEntry));
+            harmony = new Harmony(nameof(ExampleEntry) + DateTime.Now.Ticks);
+            harmony.PatchAllNoCategory();
+            harmony.PatchCategory(nameof(ExampleEntry));
         }
 
         /// <inheritdoc/>
