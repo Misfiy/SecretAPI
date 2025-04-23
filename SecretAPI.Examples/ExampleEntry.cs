@@ -1,8 +1,10 @@
 ﻿namespace SecretAPI.Examples
 {
     using System;
+    using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using SecretAPI.Examples.Settings;
+    using SecretAPI.Extensions;
     using SecretAPI.Features.UserSettings;
 
     /// <summary>
@@ -10,6 +12,8 @@
     /// </summary>
     public class ExampleEntry : Plugin
     {
+        private Harmony? _harmony;
+
         /// <inheritdoc/>
         public override string Name { get; } = "SecretAPI.Example";
 
@@ -29,6 +33,9 @@
         public override void Enable()
         {
             CustomSetting.Register(new ExampleKeybindSetting());
+            _harmony = new Harmony(nameof(ExampleEntry) + DateTime.Now.Ticks);
+            _harmony.PatchAllNoCategory();
+            _harmony.PatchCategory(nameof(ExampleEntry));
         }
 
         /// <inheritdoc/>
