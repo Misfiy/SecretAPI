@@ -27,7 +27,7 @@
         public override LoadPriority Priority => LoadPriority.Highest;
 
         /// <inheritdoc/>
-        public override Version Version { get; } = typeof(SecretApi).Assembly.GetName().Version;
+        public override Version Version { get; } = Assembly.GetName().Version;
 
         /// <inheritdoc/>
         public override Version RequiredApiVersion { get; } = new(LabApi.Features.LabApiProperties.CompiledVersion);

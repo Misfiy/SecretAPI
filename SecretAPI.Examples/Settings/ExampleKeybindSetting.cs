@@ -1,17 +1,18 @@
-﻿namespace SecretAPI.Features.UserSettings
+﻿namespace SecretAPI.Examples.Settings
 {
     using LabApi.Features.Wrappers;
+    using SecretAPI.Features.UserSettings;
     using UnityEngine;
 
     /// <summary>
-    /// Example setting to use during testing.
+    /// Example setting for keybinds.
     /// </summary>
-    internal class ExampleSetting : CustomKeybindSetting
+    public class ExampleKeybindSetting : CustomKeybindSetting
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExampleSetting"/> class.
+        /// Initializes a new instance of the <see cref="ExampleKeybindSetting"/> class.
         /// </summary>
-        public ExampleSetting()
+        public ExampleKeybindSetting()
             : base(900, "Example Kill Button", KeyCode.G)
         {
         }
@@ -20,7 +21,7 @@
         public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc />
-        protected override CustomSetting CreateDuplicate() => new ExampleSetting();
+        protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
 
         /// <inheritdoc />
         protected override void HandleSettingUpdate(Player player)
