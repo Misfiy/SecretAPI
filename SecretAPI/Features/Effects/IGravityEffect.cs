@@ -21,7 +21,7 @@
         {
             PlayerEvents.UpdatedEffect += ev =>
             {
-                Vector3 multi = Vector3.one;
+                Vector3 multi = new Vector3(0f, -19.6f, 0f);
                 foreach (StatusEffectBase effectBase in ev.Player.ActiveEffects)
                 {
                     if (effectBase is not IGravityEffect gravityEffect)
