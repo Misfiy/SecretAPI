@@ -14,7 +14,7 @@
         /// <param name="player">The player to check.</param>
         /// <param name="requester">The requester to check the player for permissions on.</param>
         /// <returns>Whether a valid permission was found.</returns>
-        public static bool HasKeycardPermission(this Player player, IDoorPermissionRequester requester)
+        public static bool HasDoorPermission(this Player player, IDoorPermissionRequester requester)
         {
             if (player.IsBypassEnabled)
                 return true;
