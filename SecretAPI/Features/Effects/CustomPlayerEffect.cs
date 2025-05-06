@@ -45,7 +45,9 @@
         internal static void Initialize()
         {
             SecretApi.Harmony?.PatchCategory(nameof(CustomPlayerEffect), SecretApi.Assembly);
+#pragma warning disable CS0618 // Type or member is obsolete
             IGravityEffect.Initialize();
+#pragma warning restore CS0618 // Type or member is obsolete
             EffectsToRegister.Add(typeof(TemporaryDamageImmunity));
             EffectsToRegister.Add(typeof(StaminaUsageDisablerEffect));
             EffectsToRegister.Add(typeof(SprintDisablerEffect));

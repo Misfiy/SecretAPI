@@ -1,10 +1,12 @@
 ﻿namespace SecretAPI.Features.Effects
 {
+    using System;
     using UnityEngine;
 
     /// <summary>
     /// Increases the gravity of the player.
     /// </summary>
+    [Obsolete("This will be removed")]
     public class GravityIncreaseEffect : CustomPlayerEffect, IGravityEffect
     {
         /// <inheritdoc />

@@ -1,12 +1,15 @@
 ﻿namespace SecretAPI.Features.Effects
 {
+    using System;
     using CustomPlayerEffects;
     using LabApi.Events.Handlers;
+    using PlayerRoles.FirstPersonControl;
     using UnityEngine;
 
     /// <summary>
     /// Handles an effect that affects gravity.
     /// </summary>
+    [Obsolete("This will be removed in the future.")]
     public interface IGravityEffect
     {
         /// <summary>
@@ -21,7 +24,7 @@
         {
             PlayerEvents.UpdatedEffect += ev =>
             {
-                Vector3 multi = new(0f, -19.6f, 0f);
+                Vector3 multi = FpcGravityController.DefaultGravity;
                 bool isAffected = false;
                 foreach (StatusEffectBase effectBase in ev.Player.ActiveEffects)
                 {
