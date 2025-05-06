@@ -9,6 +9,21 @@
     public static class PlayerExtensions
     {
         /// <summary>
+        /// Checks if a player has the permission.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <param name="permission">The permission to check.</param>
+        /// <returns>If player has permission.</returns>
+        public static bool HasGamePermission(this Player player, PlayerPermissions permission)
+        {
+            if (player.UserGroup == null)
+                return false;
+
+            PlayerPermissions currentPerms = (PlayerPermissions)player.UserGroup.Permissions;
+            return currentPerms.HasFlag(permission);
+        }
+
+        /// <summary>
         /// Checks whether a player has permission to access a <see cref="IDoorPermissionRequester"/>.
         /// </summary>
         /// <param name="player">The player to check.</param>
