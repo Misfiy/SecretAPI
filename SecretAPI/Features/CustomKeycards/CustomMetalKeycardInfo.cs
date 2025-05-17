@@ -6,7 +6,7 @@
     /// <summary>
     /// Handles info related to <see cref="ItemType.KeycardCustomMetalCase"/>.
     /// </summary>
-    public abstract class CustomMetalKeycardInfo : CustomKeycardInfo
+    public abstract class CustomMetalKeycardInfo : CustomKeycardInfo, IHolderCardInfo, ILabelCardInfo, ISerialLabelCardInfo
     {
         /// <inheritdoc />
         public override ItemType ItemType => ItemType.KeycardCustomMetalCase;
@@ -16,14 +16,10 @@
         /// </summary>
         public abstract string HolderName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the label of the card.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string CardLabel { get; set; }
 
-        /// <summary>
-        /// Gets or sets the color of the label.
-        /// </summary>
+        /// <inheritdoc />
         public abstract Color LabelColor { get; set; }
 
         /// <summary>
@@ -31,10 +27,11 @@
         /// </summary>
         public abstract byte WearLevel { get; set; }
 
-        /// <summary>
-        /// Gets or sets the label of the serial.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string SerialLabel { get; set; }
+
+        /// <inheritdoc />
+        public abstract string GetHolderName(Player player);
 
         /// <inheritdoc />
         public override KeycardItem GiveKeycard(Player player) => KeycardItem.CreateCustomKeycardMetal(
