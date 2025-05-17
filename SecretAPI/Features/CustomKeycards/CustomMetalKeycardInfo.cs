@@ -11,11 +11,6 @@
         /// <inheritdoc />
         public override ItemType ItemType => ItemType.KeycardCustomMetalCase;
 
-        /// <summary>
-        /// Gets or sets the name of the holder of the card.
-        /// </summary>
-        public abstract string HolderName { get; set; }
-
         /// <inheritdoc />
         public abstract string CardLabel { get; set; }
 
@@ -37,7 +32,7 @@
         public override KeycardItem GiveKeycard(Player player) => KeycardItem.CreateCustomKeycardMetal(
             player,
             ItemName,
-            HolderName,
+            GetHolderName(player),
             CardLabel,
             KeycardPermissions,
             PermissionsColor,
