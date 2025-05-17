@@ -1,5 +1,7 @@
 ﻿namespace SecretAPI.Features.CustomKeycards
 {
+    using LabApi.Features.Wrappers;
+
     /// <summary>
     /// Handles info related to <see cref="ItemType.KeycardCustomTaskForce"/>.
     /// </summary>
@@ -7,5 +9,10 @@
     {
         /// <inheritdoc />
         public override ItemType ItemType => ItemType.KeycardCustomTaskForce;
+
+        /// <inheritdoc />
+        public override KeycardItem GiveKeycard(Player player)
+        {
+        }
     }
 }
