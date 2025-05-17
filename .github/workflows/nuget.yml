@@ -28,9 +28,9 @@ jobs:
       - name: Rename Assembly-CSharp-Publicized to Assembly-CSharp
         shell: pwsh
         run: |
-          Rename-Item -Path "${{ env.REFERENCES_PATH }}\Assembly-CSharp-Publicized.dll" -NewName "Assembly-CSharp.dll"
+            Rename-Item -Path "${{ env.REFERENCES_PATH }}\Assembly-CSharp-Publicized.dll" -NewName "Assembly-CSharp.dll"
 
-      - name: Build project
+      - name: Build
         env:
           SL_REFERENCES: ${{ env.REFERENCES_PATH }}
         shell: pwsh

@@ -123,7 +123,8 @@
                 ordered.AddRange(grouping.Select(setting => setting.Base));
             }
 
-            ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+            if (ServerSpecificSettingsSync.DefinedSettings != null)
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
 
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
         }
