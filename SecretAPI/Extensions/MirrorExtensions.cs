@@ -37,13 +37,13 @@
         /// Send a fake rpc message to a player.
         /// </summary>
         /// <param name="target">The target to send the rpc to.</param>
-        /// <param name="behaviour"></param>
-        /// <param name="type"></param>
-        /// <param name="rpc"></param>
-        /// <param name="values"></param>
-        public static void SendFakeRpcMessage(this Player target, NetworkBehaviour behaviour, Type type, string rpc, params object[] values)
+        /// <param name="behaviour">The network behaviour containing the rpc.</param>
+        /// <param name="type">The type containing the rpc.</param>
+        /// <param name="rpcName">The name of the rpc to call.</param>
+        /// <param name="values">The values to write to the writer.</param>
+        public static void SendFakeRpcMessage(this Player target, NetworkBehaviour behaviour, Type type, string rpcName, params object[] values)
         {
-            NetworkWriter writer = NetworkWriterPool.Get();
+            NetworkWriterPooled writer = NetworkWriterPool.Get();
 
             foreach (object obj in values)
                 writer.Write(obj);
@@ -52,11 +52,12 @@
             {
                 netId = behaviour.netId,
                 componentIndex = behaviour.ComponentIndex,
-                functionHash = (ushort)$"{type.FullName}.{rpc}".GetStableHashCode(),
+                functionHash = (ushort)ReflectionExtensions.GetLongFuncName(type, rpcName).GetStableHashCode(),
                 payload = writer.ToArraySegment(),
             };
 
             target.Connection.Send(rpcMessage);
+            NetworkWriterPool.Return(writer);
         }
     }
 }
