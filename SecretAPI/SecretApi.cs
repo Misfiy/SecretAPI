@@ -47,7 +47,6 @@
         {
             Harmony = new Harmony("SecretAPI" + DateTime.Now);
             Harmony.PatchAllNoCategory(Assembly);
-            PrefabManager.Initialize();
             CustomPlayerEffect.Initialize();
         }
 

@@ -10,6 +10,7 @@
     /// </summary>
     /// <typeparam name="TPrefab">The prefab to use.</typeparam>
     public static class PrefabStore<TPrefab>
+        where TPrefab : MonoBehaviour
     {
         private static TPrefab? savedPrefab;
 
@@ -20,7 +21,7 @@
         {
             get
             {
-                if (savedPrefab != null)
+                if (savedPrefab)
                     return savedPrefab;
 
                 foreach (GameObject gameObject in NetworkClient.prefabs.Values.Concat(RagdollManager.AllRagdollPrefabs.Select(r => r.gameObject)))
@@ -29,7 +30,7 @@
                         return savedPrefab!;
                 }
 
-                return default!;
+                return null!;
             }
         }
     }
