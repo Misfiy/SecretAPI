@@ -6,24 +6,15 @@
     /// <summary>
     /// Handles info related to <see cref="ItemType.KeycardCustomSite02"/>.
     /// </summary>
-    public abstract class CustomSite02KeycardInfo : CustomKeycardInfo
+    public abstract class CustomSite02KeycardInfo : CustomKeycardInfo, IHolderCardInfo, ILabelCardInfo
     {
         /// <inheritdoc />
         public override ItemType ItemType => ItemType.KeycardCustomSite02;
 
-        /// <summary>
-        /// Gets or sets the label of the card.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string CardLabel { get; set; }
 
-        /// <summary>
-        /// Gets or sets the name of the holder of the card.
-        /// </summary>
-        public abstract string HolderName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the color of the label.
-        /// </summary>
+        /// <inheritdoc />
         public abstract Color LabelColor { get; set; }
 
         /// <summary>
@@ -32,10 +23,13 @@
         public abstract byte WearLevel { get; set; }
 
         /// <inheritdoc />
+        public abstract string GetHolderName(Player player);
+
+        /// <inheritdoc />
         public override KeycardItem GiveKeycard(Player player) => KeycardItem.CreateCustomKeycardSite02(
             player,
             ItemName,
-            HolderName,
+            GetHolderName(player),
             CardLabel,
             KeycardPermissions,
             KeycardColor,

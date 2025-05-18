@@ -5,19 +5,12 @@
     /// <summary>
     /// Handles info related to <see cref="ItemType.KeycardCustomTaskForce"/>.
     /// </summary>
-    public abstract class CustomTaskForceKeycardInfo : CustomKeycardInfo
+    public abstract class CustomTaskForceKeycardInfo : CustomKeycardInfo, IHolderCardInfo, ISerialLabelCardInfo
     {
         /// <inheritdoc />
         public override ItemType ItemType => ItemType.KeycardCustomTaskForce;
 
-        /// <summary>
-        /// Gets or sets the name of the holder of the card.
-        /// </summary>
-        public abstract string HolderName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the label of the serial.
-        /// </summary>
+        /// <inheritdoc/>
         public abstract string SerialLabel { get; set; }
 
         /// <summary>
@@ -26,10 +19,13 @@
         public abstract int RankIndex { get; set; }
 
         /// <inheritdoc />
+        public abstract string GetHolderName(Player player);
+
+        /// <inheritdoc />
         public override KeycardItem GiveKeycard(Player player) => KeycardItem.CreateCustomKeycardTaskForce(
             player,
             ItemName,
-            HolderName,
+            GetHolderName(player),
             KeycardPermissions,
             KeycardColor,
             PermissionsColor,
