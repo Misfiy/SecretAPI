@@ -15,7 +15,7 @@
         private static TPrefab? savedPrefab;
 
         /// <summary>
-        /// Gets the <see cref="TPrefab"/> associated.
+        /// Gets the prefab associated.
         /// </summary>
         public static TPrefab Prefab
         {
