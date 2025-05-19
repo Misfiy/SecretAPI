@@ -23,6 +23,14 @@
             => PlayerRoleLoader.TryGetRoleTemplate(roleTypeId, out role);
 
         /// <summary>
+        /// Gets the color of a <see cref="RoleTypeId"/>.
+        /// </summary>
+        /// <param name="roleTypeId">The role to get color of.</param>
+        /// <returns>The color found, if not found then white.</returns>
+        public static Color GetColor(this RoleTypeId roleTypeId)
+            => TryGetRoleBase(roleTypeId, out PlayerRoleBase? role) ? role.RoleColor : Color.white;
+
+        /// <summary>
         /// Tries to get a random spawn point from a <see cref="RoleTypeId"/>.
         /// </summary>
         /// <param name="role">The role to get spawn from.</param>
