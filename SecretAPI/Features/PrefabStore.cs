@@ -9,6 +9,7 @@
     /// Handles the storing of a prefab.
     /// </summary>
     /// <typeparam name="TPrefab">The prefab to use.</typeparam>
+    /// <remarks>For Ragdolls and Doors use <see cref="PrefabManager"/>.</remarks>
     public static class PrefabStore<TPrefab>
         where TPrefab : MonoBehaviour
     {
@@ -24,7 +25,7 @@
                 if (savedPrefab)
                     return savedPrefab;
 
-                foreach (GameObject gameObject in NetworkClient.prefabs.Values.Concat(RagdollManager.AllRagdollPrefabs.Select(r => r.gameObject)))
+                foreach (GameObject gameObject in NetworkClient.prefabs.Values)
                 {
                     if (gameObject.TryGetComponent(out savedPrefab))
                         return savedPrefab!;
