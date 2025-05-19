@@ -81,14 +81,13 @@
             }
 
             object? writeDelegate = writeField.GetValue(null);
-            if (writeDelegate is Delegate del)
-            {
-                del.DynamicInvoke(writer, obj);
-            }
-            else
+            if (writeDelegate is not Delegate del)
             {
                 Logger.Warn($"Writer<{obj.GetType()}>.write is not a delegate!");
+                return;
             }
+
+            del.DynamicInvoke(writer, obj);
         }
     }
 }
