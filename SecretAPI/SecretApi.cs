@@ -45,7 +45,6 @@
         public override void Enable()
         {
             Harmony = new Harmony("SecretAPI" + DateTime.Now);
-            Harmony.PatchAllNoCategory(Assembly);
             CustomPlayerEffect.Initialize();
         }
 

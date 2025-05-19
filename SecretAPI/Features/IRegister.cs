@@ -1,4 +1,4 @@
-﻿namespace SecretAPI.Interfaces
+﻿namespace SecretAPI.Features
 {
     using System;
     using System.Reflection;
