@@ -32,7 +32,7 @@
         /// <returns>The long function name.</returns>
         public static string GetLongFuncName(Type type, MethodInfo method)
         {
-            return $"{method.ReturnType.FullName} {type.FullName}::{method.Name}({string.Join(", ", method.GetParameters().Select(x => x.ParameterType.FullName))})";
+            return $"{method.ReturnType.FullName} {type.FullName}::{method.Name}({string.Join(",", method.GetParameters().Select(x => x.ParameterType.FullName))})";
         }
 
         /// <summary>
