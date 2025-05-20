@@ -152,6 +152,7 @@
         /// <summary>
         /// Handles the updating of a setting.
         /// </summary>
+        /// <param name="player">The player to update.</param>
         protected abstract void HandleSettingUpdate(Player player);
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
