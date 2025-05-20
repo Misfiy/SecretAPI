@@ -53,7 +53,7 @@
         /// Gets the <see cref="CustomHeader"/> of the setting.
         /// </summary>
         public abstract CustomHeader Header { get; }
-        
+
         /// <summary>
         /// Gets or sets the current label.
         /// </summary>
