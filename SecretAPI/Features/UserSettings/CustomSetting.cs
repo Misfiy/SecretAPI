@@ -93,10 +93,29 @@
         /// Gets a <see cref="CustomSetting"/>, used for validation.
         /// </summary>
         /// <param name="type">The type of the base setting.</param>
-        /// <param name="id">The id of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
         /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
         public static CustomSetting? Get(Type type, int id)
             => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.Base.GetType() == type);
+
+        /// <summary>
+        /// Gets a <see cref="CustomSetting"/>, used for validation.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? Get<T>(int id)
+            where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T;
+
+        /// <summary>
+        /// Gets a player's <see cref="CustomSetting"/>.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="player">The player of which to get the setting from.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? GetPlayerSetting<T>(int id, Player player)
+            where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T) && s.Owner == player) as T;
 
         /// <summary>
         /// Updates the settings of a player based on <see cref="CanView"/>.
