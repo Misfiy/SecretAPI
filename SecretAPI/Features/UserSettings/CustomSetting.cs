@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using global::UserSettings.ServerSpecific;
+    using LabApi.Events.Handlers;
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Extensions;
@@ -20,9 +21,9 @@
             SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
 
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
-            LabApi.Events.Handlers.PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
-            LabApi.Events.Handlers.PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
-            LabApi.Events.Handlers.PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
+            PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
         }
 
@@ -98,6 +99,30 @@
             => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.Base.GetType() == type);
 
         /// <summary>
+        /// Updates the settings of a player based on <see cref="CanView"/>.
+        /// </summary>
+        /// <param name="player">The player to update.</param>
+        /// <param name="version">The version of the setting. If null will use <see cref="ServerSpecificSettingsSync.Version"/>.</param>
+        /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
+        public static void SendSettingsToPlayer(Player player, int? version = null)
+        {
+            version ??= ServerSpecificSettingsSync.Version;
+
+            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
+            List<ServerSpecificSettingBase> ordered = [];
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            {
+                ordered.Add(grouping.Key.Base);
+                ordered.AddRange(grouping.Select(setting => setting.Base));
+            }
+
+            if (ServerSpecificSettingsSync.DefinedSettings != null)
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+        }
+
+        /// <summary>
         /// Checks if a player is able to view a setting.
         /// </summary>
         /// <param name="player">The player to check.</param>
@@ -116,22 +141,6 @@
         protected abstract void HandleSettingUpdate();
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
-
-        private static void SendSettingsToPlayer(Player player, int version = 1)
-        {
-            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
-            List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
-            {
-                ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(setting => setting.Base));
-            }
-
-            if (ServerSpecificSettingsSync.DefinedSettings != null)
-                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
-        }
 
         private static void OnSettingsUpdated(ReferenceHub hub, ServerSpecificSettingBase settingBase)
         {
