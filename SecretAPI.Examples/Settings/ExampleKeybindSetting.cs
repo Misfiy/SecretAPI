@@ -1,4 +1,4 @@
-﻿namespace SecretAPI.Examples.Settings
+namespace SecretAPI.Examples.Settings
 {
     using LabApi.Features.Wrappers;
     using SecretAPI.Features.UserSettings;
@@ -24,9 +24,9 @@
         protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
 
         /// <inheritdoc />
-        protected override void HandleSettingUpdate()
+        protected override void HandleSettingUpdate(Player player)
         {
-            Owner?.Kill();
+            player.Kill();
         }
     }
 }
