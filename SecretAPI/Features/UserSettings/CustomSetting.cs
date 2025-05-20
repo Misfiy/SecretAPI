@@ -152,7 +152,7 @@
         /// <summary>
         /// Handles the updating of a setting.
         /// </summary>
-        protected abstract void HandleSettingUpdate();
+        protected abstract void HandleSettingUpdate(Player player);
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
 
@@ -175,7 +175,7 @@
             settingBase.SerializeValue(valueWriter);
             newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-            newSettingPlayer.HandleSettingUpdate();
+            newSettingPlayer.HandleSettingUpdate(player);
         }
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
@@ -185,7 +185,6 @@
             if (currentSetting == null)
             {
                 currentSetting = toMatch.CreateDuplicate();
-                currentSetting.Owner = player;
                 settings.Add(currentSetting);
             }
 
