@@ -24,9 +24,9 @@
         protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
 
         /// <inheritdoc />
-        protected override void HandleSettingUpdate(Player player)
+        protected override void HandleSettingUpdate()
         {
-            player.Kill();
+            Owner?.Kill();
         }
     }
 }

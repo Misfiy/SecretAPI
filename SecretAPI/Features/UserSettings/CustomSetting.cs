@@ -54,6 +54,11 @@
         public abstract CustomHeader Header { get; }
 
         /// <summary>
+        /// Gets the <see cref="Player"/> of the setting.
+        /// </summary>
+        public Player? Owner { get; private set; }
+
+        /// <summary>
         /// Gets or sets the current label.
         /// </summary>
         public string Label
@@ -108,8 +113,7 @@
         /// <summary>
         /// Handles the updating of a setting.
         /// </summary>
-        /// <param name="player">The player to update.</param>
-        protected abstract void HandleSettingUpdate(Player player);
+        protected abstract void HandleSettingUpdate();
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
 
@@ -148,7 +152,7 @@
             settingBase.SerializeValue(valueWriter);
             newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-            newSettingPlayer.HandleSettingUpdate(player);
+            newSettingPlayer.HandleSettingUpdate();
         }
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
@@ -158,6 +162,7 @@
             if (currentSetting == null)
             {
                 currentSetting = toMatch.CreateDuplicate();
+                currentSetting.Owner = player;
                 settings.Add(currentSetting);
             }
 
