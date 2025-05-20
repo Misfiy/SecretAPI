@@ -12,7 +12,6 @@
     {
         private static bool isSet;
 
-        private static ReferenceHub? playerPrefab;
         private static BasicDoor? lczDoor;
         private static BasicDoor? hczDoor;
         private static BasicDoor? hczBulkDoor;
@@ -21,8 +20,7 @@
         /// <summary>
         /// Gets the <see cref="ReferenceHub"/> prefab.
         /// </summary>
-        public static ReferenceHub PlayerPrefab
-            => playerPrefab ??= NetworkManager.singleton.playerPrefab.GetComponent<ReferenceHub>();
+        public static ReferenceHub PlayerPrefab => PrefabStore<ReferenceHub>.Prefab;
 
         /// <summary>
         /// Gets the <see cref="BasicDoor"/> found in <see cref="FacilityZone.LightContainment"/>.
@@ -77,11 +75,8 @@
             if (isSet)
                 return;
 
-            foreach (GameObject gameObject in NetworkClient.prefabs.Values)
+            foreach (BasicDoor door in PrefabStore<BasicDoor>.AllComponentPrefabs)
             {
-                if (!gameObject.TryGetComponent(out BasicDoor door))
-                    continue;
-
                 switch (door.name)
                 {
                     case "LCZ BreakableDoor":
