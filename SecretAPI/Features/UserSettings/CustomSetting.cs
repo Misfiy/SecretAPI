@@ -115,7 +115,7 @@
         /// <typeparam name="T">The setting class to check for.</typeparam>
         /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
         public static T? GetPlayerSetting<T>(int id, Player player)
-            where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T) && s.Owner == player) as T;
+            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings) ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T : null;
 
         /// <summary>
         /// Updates the settings of a player based on <see cref="CanView"/>.
