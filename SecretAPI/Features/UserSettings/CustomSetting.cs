@@ -53,12 +53,7 @@
         /// Gets the <see cref="CustomHeader"/> of the setting.
         /// </summary>
         public abstract CustomHeader Header { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Player"/> of the setting.
-        /// </summary>
-        public Player? Owner { get; private set; }
-
+        
         /// <summary>
         /// Gets or sets the current label.
         /// </summary>
