@@ -32,17 +32,17 @@
         /// <summary>
         /// Gets the <see cref="BasicDoor"/> found in <see cref="FacilityZone.HeavyContainment"/>.
         /// </summary>
-        public static BasicDoor HczDoor => hczDoor ??= GetDoor(HczDoorName);
+        public static BasicDoor HczDoorPrefab => hczDoor ??= GetDoor(HczDoorName);
 
         /// <summary>
         /// Gets the <see cref="BasicDoor"/> found in <see cref="FacilityZone.HeavyContainment"/>.
         /// </summary>
-        public static BasicDoor HczBulkDoor => hczBulkDoor ??= GetDoor(HczBulkDoorName);
+        public static BasicDoor HczBulkDoorPrefab => hczBulkDoor ??= GetDoor(HczBulkDoorName);
 
         /// <summary>
         /// Gets the <see cref="BasicDoor"/> found in <see cref="FacilityZone.Entrance"/>.
         /// </summary>
-        public static BasicDoor EzDoor => ezDoor ??= GetDoor(EzDoorName);
+        public static BasicDoor EzDoorPrefab => ezDoor ??= GetDoor(EzDoorName);
 
         private static BasicDoor GetDoor(string name)
             => PrefabStore<BasicDoor>.AllComponentPrefabs.FirstOrDefault(d => d.name == name)!;
