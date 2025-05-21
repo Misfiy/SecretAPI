@@ -41,5 +41,10 @@
         /// Used to consider the player's ENTIRE inventory.
         /// </summary>
         FullInventory = CurrentItem | InventoryExludingCurrent,
+
+        /// <summary>
+        /// Used to consider all.
+        /// </summary>
+        All = Bypass | Role | FullInventory,
     }
 }
