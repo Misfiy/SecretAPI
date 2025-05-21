@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using global::UserSettings.ServerSpecific;
+    using LabApi.Events.Handlers;
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Extensions;
@@ -20,9 +22,9 @@
             SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
 
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
-            LabApi.Events.Handlers.PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
-            LabApi.Events.Handlers.PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
-            LabApi.Events.Handlers.PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
+            PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
         }
 
@@ -84,13 +86,83 @@
         public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
 
         /// <summary>
+        /// Tries to get player specific setting.
+        /// </summary>
+        /// <param name="player">The player to get settings of.</param>
+        /// <param name="setting">The setting found.</param>
+        /// <typeparam name="T">The setting type to find.</typeparam>
+        /// <returns>Whether setting was found.</returns>
+        public static bool TryGet<T>(Player player, [NotNullWhen(true)] out T? setting)
+            where T : CustomSetting
+        {
+            setting = null;
+
+            if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? settings))
+                return false;
+
+            foreach (CustomSetting toCheck in settings)
+            {
+                if (toCheck is T value)
+                {
+                    setting = value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets a <see cref="CustomSetting"/>, used for validation.
         /// </summary>
         /// <param name="type">The type of the base setting.</param>
-        /// <param name="id">The id of the setting.</param>
+        /// <param name="id">The ID of the setting.</param>
         /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
         public static CustomSetting? Get(Type type, int id)
             => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.Base.GetType() == type);
+
+        /// <summary>
+        /// Gets a <see cref="CustomSetting"/>, used for validation.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? Get<T>(int id)
+            where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T;
+
+        /// <summary>
+        /// Gets a player's <see cref="CustomSetting"/>.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="player">The player of which to get the setting from.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? GetPlayerSetting<T>(int id, Player player)
+            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings) ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T : null;
+
+        /// <summary>
+        /// Updates the settings of a player based on <see cref="CanView"/>.
+        /// </summary>
+        /// <param name="player">The player to update.</param>
+        /// <param name="version">The version of the setting. If null will use <see cref="ServerSpecificSettingsSync.Version"/>.</param>
+        /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
+        public static void SendSettingsToPlayer(Player player, int? version = null)
+        {
+            version ??= ServerSpecificSettingsSync.Version;
+
+            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
+            List<ServerSpecificSettingBase> ordered = [];
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            {
+                ordered.Add(grouping.Key.Base);
+                ordered.AddRange(grouping.Select(setting => setting.Base));
+            }
+
+            if (ServerSpecificSettingsSync.DefinedSettings != null)
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+        }
 
         /// <summary>
         /// Checks if a player is able to view a setting.
@@ -112,22 +184,6 @@
         protected abstract void HandleSettingUpdate(Player player);
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
-
-        private static void SendSettingsToPlayer(Player player, int version = 1)
-        {
-            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
-            List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
-            {
-                ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(setting => setting.Base));
-            }
-
-            if (ServerSpecificSettingsSync.DefinedSettings != null)
-                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
-        }
 
         private static void OnSettingsUpdated(ReferenceHub hub, ServerSpecificSettingBase settingBase)
         {

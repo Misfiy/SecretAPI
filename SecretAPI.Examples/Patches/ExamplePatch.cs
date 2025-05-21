@@ -7,7 +7,7 @@
     /// An example harmony patch.
     /// </summary>
     [HarmonyPatchCategory(nameof(ExampleEntry))]
-    [HarmonyPatch]
+    /*[HarmonyPatch]*/
     public static class ExamplePatch
     {
         private static bool Prefix()

@@ -2,6 +2,7 @@
 {
     using Interactables.Interobjects.DoorUtils;
     using LabApi.Features.Wrappers;
+    using SecretAPI.Enums;
 
     /// <summary>
     /// Extensions related to the player.
@@ -28,17 +29,25 @@
         /// </summary>
         /// <param name="player">The player to check.</param>
         /// <param name="requester">The requester to check the player for permissions on.</param>
+        /// <param name="checkFlags">The <see cref="DoorPermissionCheck"/> to use for checking if a player has it.</param>
         /// <returns>Whether a valid permission was found.</returns>
-        public static bool HasDoorPermission(this Player player, IDoorPermissionRequester requester)
+        public static bool HasDoorPermission(this Player player, IDoorPermissionRequester requester, DoorPermissionCheck checkFlags = DoorPermissionCheck.Bypass | DoorPermissionCheck.Role | DoorPermissionCheck.CurrentItem)
         {
-            if (player.IsBypassEnabled)
+            if (checkFlags.HasFlag(DoorPermissionCheck.Bypass) && player.IsBypassEnabled)
                 return true;
 
-            if (player.RoleBase is IDoorPermissionProvider roleProvider && requester.PermissionsPolicy.CheckPermissions(roleProvider.GetPermissions(requester)))
+            if (checkFlags.HasFlag(DoorPermissionCheck.Role) && player.RoleBase is IDoorPermissionProvider roleProvider && requester.PermissionsPolicy.CheckPermissions(roleProvider.GetPermissions(requester)))
                 return true;
 
-            foreach (Item? item in player.Items)
+            foreach (Item item in player.Items)
             {
+                bool isCurrent = item == player.CurrentItem;
+                if (!checkFlags.HasFlag(DoorPermissionCheck.CurrentItem) && isCurrent)
+                    continue;
+
+                if (!checkFlags.HasFlag(DoorPermissionCheck.InventoryExludingCurrent) && !isCurrent)
+                    continue;
+
                 if (item?.Base is IDoorPermissionProvider itemProvider && requester.PermissionsPolicy.CheckPermissions(itemProvider.GetPermissions(requester)))
                     return true;
             }
