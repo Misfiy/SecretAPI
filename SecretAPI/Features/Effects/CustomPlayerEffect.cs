@@ -56,7 +56,7 @@
 
                 isLoaded = true;
 
-                Transform playerEffects = NetworkManager.singleton.playerPrefab.GetComponent<PlayerEffectsController>().effectsGameObject.transform;
+                Transform playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject.transform;
                 foreach (Type type in EffectsToRegister)
                 {
                     if (!typeof(StatusEffectBase).IsAssignableFrom(type))
