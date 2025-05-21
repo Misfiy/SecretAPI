@@ -14,8 +14,8 @@
     public static class PrefabStore<TPrefab>
         where TPrefab : NetworkBehaviour
     {
+        private static TPrefab[]? collection;
         private static TPrefab? savedPrefab;
-        private static IEnumerable<TPrefab>? collection;
 
         /// <summary>
         /// Gets the first prefab found of the specified type.
@@ -43,7 +43,7 @@
         /// <summary>
         /// Gets every single prefab associated with this component.
         /// </summary>
-        /// <remarks>Used to find all of a base type (such as <see cref="BasicDoor"/>, <see cref="AdminToyBase"/>).</remarks>
+        /// <remarks>Used to find all of a base type (such as <see cref="BasicDoor"/>).</remarks>
         public static IEnumerable<TPrefab> AllComponentPrefabs
         {
             get
@@ -59,7 +59,7 @@
                         allPrefabs.Add(prefab);
                 }
 
-                collection = allPrefabs;
+                collection = allPrefabs.ToArray();
                 return collection;
             }
         }
