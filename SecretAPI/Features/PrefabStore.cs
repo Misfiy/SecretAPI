@@ -38,7 +38,7 @@
         /// Gets every single prefab associated with this component.
         /// </summary>
         /// <remarks>Used to find all of a base type (such as <see cref="BasicDoor"/>).</remarks>
-        public static IEnumerable<TPrefab> AllComponentPrefabs
+        public static TPrefab[] AllComponentPrefabs
         {
             get
             {
