@@ -1,7 +1,7 @@
 ﻿namespace SecretAPI.Features
 {
     using System.Collections.Generic;
-    using AdminToys;
+    using System.Linq;
     using Interactables.Interobjects;
     using Mirror;
     using UnityEngine;
@@ -30,13 +30,7 @@
                 if (typeof(TPrefab) == typeof(ReferenceHub))
                     return savedPrefab = NetworkManager.singleton.playerPrefab.GetComponent<TPrefab>();
 
-                foreach (GameObject gameObject in NetworkClient.prefabs.Values)
-                {
-                    if (gameObject.TryGetComponent(out savedPrefab))
-                        return savedPrefab!;
-                }
-
-                return null!;
+                return savedPrefab = AllComponentPrefabs.FirstOrDefault()!;
             }
         }
 
