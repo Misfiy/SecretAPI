@@ -1,4 +1,4 @@
-﻿namespace SecretAPI.Examples.Settings
+namespace SecretAPI.Examples.Settings
 {
     using LabApi.Features.Wrappers;
     using SecretAPI.Features.UserSettings;
