@@ -12,7 +12,7 @@
     /// <typeparam name="TPrefab">The prefab to use.</typeparam>
     /// <remarks>For Ragdolls and Doors use <see cref="PrefabManager"/>.</remarks>
     public static class PrefabStore<TPrefab>
-        where TPrefab : MonoBehaviour
+        where TPrefab : NetworkBehaviour
     {
         private static TPrefab? savedPrefab;
         private static IEnumerable<TPrefab>? collection;
