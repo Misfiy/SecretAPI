@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
@@ -83,6 +84,37 @@
         /// </summary>
         /// <param name="settings">The settings to register.</param>
         public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+
+        /// <summary>
+        /// Tries to get player specific setting.
+        /// </summary>
+        /// <param name="player">The palayer to get settings of.</param>
+        /// <param name="setting">The setting found.</param>
+        /// <typeparam name="T">The setting type to find.</typeparam>
+        /// <returns>Whether setting was found.</returns>
+        public static bool TryGet<T>(Player player, [NotNullWhen(true)] out T? setting)
+            where T : CustomSetting
+        {
+            setting = null;
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (player is null)
+                return false;
+
+            if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? settings))
+                return false;
+
+            foreach (CustomSetting toCheck in settings)
+            {
+                if (toCheck is T value)
+                {
+                    setting = value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Gets a <see cref="CustomSetting"/>, used for validation.
