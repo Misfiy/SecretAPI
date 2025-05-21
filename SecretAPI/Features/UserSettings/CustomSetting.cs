@@ -88,7 +88,7 @@
         /// <summary>
         /// Tries to get player specific setting.
         /// </summary>
-        /// <param name="player">The palayer to get settings of.</param>
+        /// <param name="player">The player to get settings of.</param>
         /// <param name="setting">The setting found.</param>
         /// <typeparam name="T">The setting type to find.</typeparam>
         /// <returns>Whether setting was found.</returns>
@@ -96,10 +96,6 @@
             where T : CustomSetting
         {
             setting = null;
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (player is null)
-                return false;
 
             if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? settings))
                 return false;
