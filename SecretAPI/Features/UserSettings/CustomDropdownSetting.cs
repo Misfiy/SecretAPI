@@ -1,5 +1,6 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
+    using System;
     using global::UserSettings.ServerSpecific;
 
     /// <summary>
@@ -46,6 +47,7 @@
         public string[] Options
         {
             get => Base.Options;
+            [Obsolete("Setting this value is not currently supported.")]
             set => Base.Options = value;
         }
 
