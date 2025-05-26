@@ -8,6 +8,7 @@
     using LabApi.Events.Handlers;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using NorthwoodLib.Pools;
     using SecretAPI.Extensions;
 
     /// <summary>
@@ -72,6 +73,11 @@
             get => Base.SettingId;
             set => Base.SettingId = value;
         }
+
+        /// <summary>
+        /// Gets or sets the last known owner of the object, used for resync.
+        /// </summary>
+        protected Player? LastKnownOwner { get; set; }
 
         /// <summary>
         /// Registers a collection of settings.
@@ -151,17 +157,48 @@
             version ??= ServerSpecificSettingsSync.Version;
 
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
-            List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            List<ServerSpecificSettingBase> ordered = GetBaseSettingsGrouped(hasAccess);
+
+            if (ServerSpecificSettingsSync.DefinedSettings != null)
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
+            ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
+        }
+
+        /// <summary>
+        /// Updates a <see cref="Player"/>'s setting based on already added settings.
+        /// </summary>
+        /// <param name="player">The player to update.</param>
+        /// <param name="version">The version of the update to send.</param>
+        public static void UpdatePlayerSettings(Player player, int? version = null)
+        {
+            version ??= ServerSpecificSettingsSync.Version;
+
+            if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? existingSettings))
+                return;
+
+            List<ServerSpecificSettingBase> settings = GetBaseSettingsGrouped(existingSettings);
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, settings.ToArray(), version);
+            ListPool<ServerSpecificSettingBase>.Shared.Return(settings);
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="ServerSpecificSettingBase"/> based on <see cref="CustomSetting"/> in proper order.
+        /// </summary>
+        /// <param name="settings">The settings to order and get bases of.</param>
+        /// <returns>The base of the settings, in order of Header.</returns>
+        /// <remarks>This will return a Pooled list. Make sure to return it.</remarks>
+        public static List<ServerSpecificSettingBase> GetBaseSettingsGrouped(IEnumerable<CustomSetting> settings)
+        {
+            List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in settings.GroupBy(setting => setting.Header))
             {
                 ordered.Add(grouping.Key.Base);
                 ordered.AddRange(grouping.Select(setting => setting.Base));
             }
 
-            if (ServerSpecificSettingsSync.DefinedSettings != null)
-                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+            return ordered;
         }
 
         /// <summary>

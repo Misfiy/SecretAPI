@@ -62,7 +62,12 @@
         public float MinimumValue
         {
             get => Base.MinValue;
-            set => Base.MinValue = value;
+            set
+            {
+                Base.MinValue = value;
+                if (LastKnownOwner != null)
+                    UpdatePlayerSettings(LastKnownOwner);
+            }
         }
 
         /// <summary>
@@ -71,7 +76,12 @@
         public float MaximumValue
         {
             get => Base.MaxValue;
-            set => Base.MaxValue = value;
+            set
+            {
+                Base.MaxValue = value;
+                if (LastKnownOwner != null)
+                    UpdatePlayerSettings(LastKnownOwner);
+            }
         }
 
         /// <summary>
@@ -80,7 +90,12 @@
         public float DefaultValue
         {
             get => Base.DefaultValue;
-            set => Base.DefaultValue = value;
+            set
+            {
+                Base.DefaultValue = value;
+                if (LastKnownOwner != null)
+                    UpdatePlayerSettings(LastKnownOwner);
+            }
         }
     }
 }
