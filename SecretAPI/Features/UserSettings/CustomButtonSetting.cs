@@ -45,6 +45,7 @@
         public string Text
         {
             get => Base.ButtonText;
+            [Obsolete("Setting this value is not currently supported.")]
             set => Base.ButtonText = value;
         }
 
@@ -54,6 +55,7 @@
         public float HoldTime
         {
             get => Base.HoldTimeSeconds;
+            [Obsolete("Setting this value is not currently supported.")]
             set => Base.HoldTimeSeconds = value;
         }
     }
