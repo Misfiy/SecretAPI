@@ -65,8 +65,7 @@
             set
             {
                 Base.MinValue = value;
-                if (LastKnownOwner != null)
-                    UpdatePlayerSettings(LastKnownOwner);
+                UpdatePlayerSettings(LastKnownOwner);
             }
         }
 
@@ -79,8 +78,7 @@
             set
             {
                 Base.MaxValue = value;
-                if (LastKnownOwner != null)
-                    UpdatePlayerSettings(LastKnownOwner);
+                UpdatePlayerSettings(LastKnownOwner);
             }
         }
 
@@ -93,8 +91,7 @@
             set
             {
                 Base.DefaultValue = value;
-                if (LastKnownOwner != null)
-                    UpdatePlayerSettings(LastKnownOwner);
+                UpdatePlayerSettings(LastKnownOwner);
             }
         }
     }

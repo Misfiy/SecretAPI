@@ -171,8 +171,11 @@
         /// </summary>
         /// <param name="player">The player to update.</param>
         /// <param name="version">The version of the update to send.</param>
-        public static void UpdatePlayerSettings(Player player, int? version = null)
+        public static void UpdatePlayerSettings(Player? player, int? version = null)
         {
+            if (player == null)
+                return;
+
             version ??= ServerSpecificSettingsSync.Version;
 
             if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? existingSettings))
