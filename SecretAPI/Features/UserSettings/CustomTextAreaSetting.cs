@@ -38,5 +38,15 @@
 
         /// <inheritdoc />
         public new SSTextArea Base { get; }
+
+        /// <summary>
+        /// Gets the foldout mode.
+        /// </summary>
+        public SSTextArea.FoldoutMode Foldout => Base.Foldout;
+
+        /// <summary>
+        /// Gets the <see cref="TextAlignmentOptions"/> of the setting.
+        /// </summary>
+        public TextAlignmentOptions AlignmentOptions => Base.AlignmentOptions;
     }
 }
