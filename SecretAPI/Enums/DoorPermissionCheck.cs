@@ -46,7 +46,7 @@
         /// <summary>
         /// Used to consider all.
         /// </summary>
-        All = Bypass | Role | FullInventory,
+        All = -1,
 
         /// <summary>
         /// Used to mirror default base-game checks (bypass mode, role and held item).
