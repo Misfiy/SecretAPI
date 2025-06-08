@@ -38,5 +38,10 @@
 
         /// <inheritdoc/>
         public new SSKeybindSetting Base { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the keybind is pressed.
+        /// </summary>
+        public bool IsPressed => Base.SyncIsPressed;
     }
 }
