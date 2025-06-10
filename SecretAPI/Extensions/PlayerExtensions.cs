@@ -28,10 +28,10 @@
         /// Checks whether a player has permission to access a <see cref="IDoorPermissionRequester"/>.
         /// </summary>
         /// <param name="player">The player to check.</param>
-        /// <param name="requester">The requester to check the player for permissions on.</param>
+        /// <param name="requester">The requester to check for permissions.</param>
         /// <param name="checkFlags">The <see cref="DoorPermissionCheck"/> to use for checking if a player has it.</param>
         /// <returns>Whether a valid permission was found.</returns>
-        public static bool HasDoorPermission(this Player player, IDoorPermissionRequester requester, DoorPermissionCheck checkFlags = DoorPermissionCheck.Bypass | DoorPermissionCheck.Role | DoorPermissionCheck.CurrentItem)
+        public static bool HasDoorPermission(this Player player, IDoorPermissionRequester requester, DoorPermissionCheck checkFlags = DoorPermissionCheck.Default)
         {
             if (checkFlags.HasFlag(DoorPermissionCheck.Bypass) && player.IsBypassEnabled)
                 return true;
@@ -48,11 +48,41 @@
                 if (!checkFlags.HasFlag(DoorPermissionCheck.InventoryExludingCurrent) && !isCurrent)
                     continue;
 
-                if (item?.Base is IDoorPermissionProvider itemProvider && requester.PermissionsPolicy.CheckPermissions(itemProvider.GetPermissions(requester)))
+                if (item.Base is IDoorPermissionProvider itemProvider && requester.PermissionsPolicy.CheckPermissions(itemProvider.GetPermissions(requester)))
                     return true;
             }
 
             return false;
         }
+
+        /// <summary>
+        /// Checks whether a player has permission to access a <see cref="Door"/>.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <param name="door">The door to check for permissions.</param>
+        /// <param name="checkFlags">The <see cref="DoorPermissionCheck"/> to use for checking if a player has it.</param>
+        /// <returns>Whether a valid permission was found.</returns>
+        public static bool HasDoorPermission(this Player player, Door door, DoorPermissionCheck checkFlags = DoorPermissionCheck.Default)
+            => player.HasDoorPermission(door.Base, checkFlags);
+
+        /// <summary>
+        /// Checks whether a player has permission to access a <see cref="LockerChamber"/>.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <param name="chamber">The locker chamber to check for permissions.</param>
+        /// <param name="checkFlags">The <see cref="DoorPermissionCheck"/> to use for checking if a player has it.</param>
+        /// <returns>Whether a valid permission was found.</returns>
+        public static bool HasLockerChamberPermission(this Player player, LockerChamber chamber, DoorPermissionCheck checkFlags = DoorPermissionCheck.Default)
+            => player.HasDoorPermission(chamber.Base, checkFlags);
+
+        /// <summary>
+        /// Checks whether a player has permission to access a <see cref="Generator"/>.
+        /// </summary>
+        /// <param name="player">The player to check.</param>
+        /// <param name="generator">The generator to check for permissions.</param>
+        /// <param name="checkFlags">The <see cref="DoorPermissionCheck"/> to use for checking if a player has it.</param>
+        /// <returns>Whether a valid permission was found.</returns>
+        public static bool HasGeneratorPermission(this Player player, Generator generator, DoorPermissionCheck checkFlags = DoorPermissionCheck.Default)
+            => player.HasDoorPermission(generator.Base, checkFlags);
     }
 }
