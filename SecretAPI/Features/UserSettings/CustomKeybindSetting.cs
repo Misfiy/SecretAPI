@@ -27,7 +27,7 @@
         /// <param name="suggestedKey">The suggested key.</param>
         /// <param name="preventInteractionOnGui">Whether to prevent interaction in a GUI.</param>
         /// <param name="hint">The hint to show.</param>
-        [Obsolete]
+        [Obsolete("Use CustomKeybindSetting(int?, string, KeyCode, bool, bool, string?)")]
         protected CustomKeybindSetting(
             int? id,
             string label,
