@@ -7,7 +7,7 @@
 - RoomExtensions: Extensions to help with room specific tasks, like checking if a room is safe to teleport to.
 - HarmonyExtensions: Extensions to provide more utility to Harmony patching, like adding some updated Harmony features which can't be utilised, i.e. patching by category.
 - CustomPlayerEffect: Create custom status effects using the base-game system.
-- IRegister: Handle auto registering certain plugin features using this interface and then running `IRegister.RegisterAll()` in your plugin's initialise method.
+- IRegister: Handle auto registering certain plugin features inheriting this interface and then running `IRegister.RegisterAll()` in your plugin's initialise method.
 - CustomSetting: Server Specific Settings without the management hassle, control everything for 1 setting in 1 class, including permissions. A better setting system overall.
 
 # Examples
