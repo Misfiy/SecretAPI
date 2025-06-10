@@ -36,12 +36,18 @@
         /// <summary>
         /// Used to consider the player's inventory, not including the item they are holding.
         /// </summary>
-        InventoryExludingCurrent = 8,
+        InventoryExcludingCurrent = 8,
+
+        /// <summary>
+        /// Used to consider the player's inventory, not including the item they are holding.
+        /// </summary>
+        [Obsolete("Use DoorPermissionCheck.InventoryExcludingCurrent - this is mispelled")]
+        InventoryExludingCurrent = InventoryExcludingCurrent,
 
         /// <summary>
         /// Used to consider the player's ENTIRE inventory.
         /// </summary>
-        FullInventory = CurrentItem | InventoryExludingCurrent,
+        FullInventory = CurrentItem | InventoryExcludingCurrent,
 
         /// <summary>
         /// Used to consider all.

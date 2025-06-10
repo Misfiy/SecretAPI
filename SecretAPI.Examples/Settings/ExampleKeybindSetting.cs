@@ -13,7 +13,7 @@ namespace SecretAPI.Examples.Settings
         /// Initializes a new instance of the <see cref="ExampleKeybindSetting"/> class.
         /// </summary>
         public ExampleKeybindSetting()
-            : base(900, "Example Kill Button", KeyCode.G)
+            : base(900, "Example Kill Button", KeyCode.G, allowSpectatorTrigger: false)
         {
         }
 
