@@ -22,7 +22,10 @@
         /// <summary>
         /// Attemps to unregister the object.
         /// </summary>
-        public void TryUnregister();
+        public void TryUnregister()
+        {
+            // default empty to prevent breaking change
+        }
 
         /// <summary>
         /// Registers all <see cref="IRegister"/>.
@@ -45,6 +48,7 @@
                 object obj = Activator.CreateInstance(type);
                 if (obj is not IRegister register)
                     continue;
+
                 registerables[assembly].Add(register);
                 register.TryRegister();
             }
