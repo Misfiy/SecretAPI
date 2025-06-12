@@ -1,5 +1,6 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
+    using System;
     using global::UserSettings.ServerSpecific;
     using UnityEngine;
 
@@ -26,13 +27,34 @@
         /// <param name="suggestedKey">The suggested key.</param>
         /// <param name="preventInteractionOnGui">Whether to prevent interaction in a GUI.</param>
         /// <param name="hint">The hint to show.</param>
+        [Obsolete("Use CustomKeybindSetting(int?, string, KeyCode, bool, bool, string?)")]
         protected CustomKeybindSetting(
             int? id,
             string label,
             KeyCode suggestedKey = KeyCode.None,
             bool preventInteractionOnGui = true,
             string? hint = null)
-            : this(new SSKeybindSetting(id, label, suggestedKey, preventInteractionOnGui, hint))
+            : this(id, label, suggestedKey, preventInteractionOnGui, true, hint)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomKeybindSetting"/> class.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="label">The setting's label.</param>
+        /// <param name="suggestedKey">The suggested key.</param>
+        /// <param name="preventInteractionOnGui">Whether to prevent interaction in a GUI.</param>
+        /// <param name="allowSpectatorTrigger">Whether to allow spectators to trigger.</param>
+        /// <param name="hint">The hint to show.</param>
+        protected CustomKeybindSetting(
+            int? id,
+            string label,
+            KeyCode suggestedKey = KeyCode.None,
+            bool preventInteractionOnGui = true,
+            bool allowSpectatorTrigger = true,
+            string? hint = null)
+            : this(new SSKeybindSetting(id, label, suggestedKey, preventInteractionOnGui, allowSpectatorTrigger, hint))
         {
         }
 

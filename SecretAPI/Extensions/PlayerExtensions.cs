@@ -45,7 +45,7 @@
                 if (!checkFlags.HasFlag(DoorPermissionCheck.CurrentItem) && isCurrent)
                     continue;
 
-                if (!checkFlags.HasFlag(DoorPermissionCheck.InventoryExludingCurrent) && !isCurrent)
+                if (!checkFlags.HasFlag(DoorPermissionCheck.InventoryExcludingCurrent) && !isCurrent)
                     continue;
 
                 if (item.Base is IDoorPermissionProvider itemProvider && requester.PermissionsPolicy.CheckPermissions(itemProvider.GetPermissions(requester)))
