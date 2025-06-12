@@ -1,13 +1,14 @@
 ﻿namespace SecretAPI.Enums
 {
     using System;
+    using Interactables.Interobjects.DoorUtils;
     using LabApi.Features.Wrappers;
     using PlayerRoles;
     using PlayerStatsSystem;
     using SecretAPI.Extensions;
 
     /// <summary>
-    /// Flags to use for <see cref="PlayerExtensions.HasDoorPermission"/>.
+    /// Flags to use for <see cref="PlayerExtensions.HasDoorPermission(Player,IDoorPermissionRequester,DoorPermissionCheck)"/>.
     /// </summary>
     [Flags]
     public enum DoorPermissionCheck
@@ -35,16 +36,27 @@
         /// <summary>
         /// Used to consider the player's inventory, not including the item they are holding.
         /// </summary>
-        InventoryExludingCurrent = 8,
+        InventoryExcludingCurrent = 8,
+
+        /// <summary>
+        /// Used to consider the player's inventory, not including the item they are holding.
+        /// </summary>
+        [Obsolete("Use DoorPermissionCheck.InventoryExcludingCurrent - this is mispelled")]
+        InventoryExludingCurrent = InventoryExcludingCurrent,
 
         /// <summary>
         /// Used to consider the player's ENTIRE inventory.
         /// </summary>
-        FullInventory = CurrentItem | InventoryExludingCurrent,
+        FullInventory = CurrentItem | InventoryExcludingCurrent,
 
         /// <summary>
         /// Used to consider all.
         /// </summary>
-        All = Bypass | Role | FullInventory,
+        All = -1,
+
+        /// <summary>
+        /// Used to mirror default base-game checks (bypass mode, role and held item).
+        /// </summary>
+        Default = Bypass | Role | CurrentItem,
     }
 }
