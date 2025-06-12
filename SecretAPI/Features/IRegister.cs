@@ -32,7 +32,7 @@
         {
             assembly ??= Assembly.GetCallingAssembly();
 
-            registerables.Add(assembly, new());
+            registerables.TryAdd(assembly, new());
 
             foreach (Type type in assembly.GetTypes())
             {
