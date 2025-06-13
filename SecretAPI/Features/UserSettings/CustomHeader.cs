@@ -21,12 +21,12 @@
         /// <summary>
         /// Gets a <see cref="CustomHeader"/> for Gameplay purposes.
         /// </summary>
-        public static CustomHeader Gameplay { get; } = new("Gameplay");
+        public static CustomHeader Gameplay { get; } = new("Gameplay", hint: "Features that affect gameplay");
 
         /// <summary>
         /// Gets a <see cref="CustomHeader"/> for Example purposes.
         /// </summary>
-        public static CustomHeader Examples { get; } = new("Examples");
+        public static CustomHeader Examples { get; } = new("Examples", hint: "Features used as examples");
 
         /// <inheritdoc />
         public SSGroupHeader Base { get; }

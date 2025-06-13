@@ -1,6 +1,8 @@
 ﻿namespace SecretAPI.Patches.Features
 {
+    using System;
     using HarmonyLib;
+    using LabApi.Features.Console;
     using SecretAPI.Attribute;
     using SecretAPI.Features.UserSettings;
     using UserSettings.ServerSpecific;
@@ -16,6 +18,7 @@
         private static void Postfix(ServerSpecificSettingBase __instance, ref ServerSpecificSettingBase __result)
 #pragma warning restore SA1313
         {
+            // ignore if basegame is success (support non SecretAPI settings)
             if (__result != null)
                 return;
 

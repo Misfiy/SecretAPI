@@ -2,6 +2,7 @@
 {
     using System;
     using HarmonyLib;
+    using LabApi.Features.Console;
     using LabApi.Loader.Features.Plugins;
     using SecretAPI.Examples.Settings;
     using SecretAPI.Extensions;
@@ -32,7 +33,8 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            CustomSetting.Register(new ExampleKeybindSetting());
+            CustomSetting.Register(new ExampleKeybindSetting(), new ExampleDropdownSetting());
+
             harmony = new Harmony(nameof(ExampleEntry) + DateTime.Now.Ticks);
             harmony.PatchAllNoCategory();
             harmony.PatchCategory(nameof(ExampleEntry));

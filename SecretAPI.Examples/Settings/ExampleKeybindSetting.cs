@@ -3,6 +3,7 @@ namespace SecretAPI.Examples.Settings
     using LabApi.Features.Wrappers;
     using SecretAPI.Features.UserSettings;
     using UnityEngine;
+    using Logger = LabApi.Features.Console.Logger;
 
     /// <summary>
     /// Example setting for keybinds.
@@ -26,6 +27,9 @@ namespace SecretAPI.Examples.Settings
         /// <inheritdoc />
         protected override void HandleSettingUpdate(Player player)
         {
+            if (!IsPressed)
+                return;
+
             player.Kill();
         }
     }
