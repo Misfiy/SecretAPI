@@ -22,10 +22,12 @@
             SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
 
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
-            PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
-            PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
-            PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
+            ServerSpecificSettingsSync.DefinedSettings ??= []; // fix nw
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
+
+            PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.GroupChanged += ev => SendSettingsToPlayer(ev.Player);
+            PlayerEvents.Left += ev => RemoveStoredPlayer(ev.Player);
         }
 
         /// <summary>
@@ -61,6 +63,7 @@
         public string Label
         {
             get => Base.Label;
+            [Obsolete("Should not be set after creation.")]
             set => Base.Label = value;
         }
 
@@ -70,6 +73,7 @@
         public int Id
         {
             get => Base.SettingId;
+            [Obsolete("Should not be set after creation.")]
             set => Base.SettingId = value;
         }
 
