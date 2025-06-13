@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     
     env:
-      REFERENCES_URL: https://exslmod-team.github.io/SL-References/LabAPI.zip
+      REFERENCES_URL: https://exmod-team.github.io/SL-References/Dev.zip
       REFERENCES_PATH: ${{ github.workspace }}/References
 
     steps:
