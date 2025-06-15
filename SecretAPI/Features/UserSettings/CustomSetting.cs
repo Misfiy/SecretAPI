@@ -6,6 +6,7 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
+    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Extensions;
@@ -22,7 +23,7 @@
             SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
 
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
-            ServerSpecificSettingsSync.DefinedSettings ??= []; // fix nw
+            ServerSpecificSettingsSync.DefinedSettings ??= []; // fix nw issue
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
 
             PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
@@ -117,6 +118,33 @@
         }
 
         /// <summary>
+        /// Tries to get player specific setting.
+        /// </summary>
+        /// <param name="player">The player to get settings of.</param>
+        /// <param name="setting">The setting found.</param>
+        /// <typeparam name="T">The setting type to find.</typeparam>
+        /// <returns>Whether setting was found.</returns>
+        public static bool TryGetPlayerSetting<T>(Player player, [NotNullWhen(true)] out T? setting)
+            where T : CustomSetting
+        {
+            setting = null;
+
+            if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? settings))
+                return false;
+
+            foreach (CustomSetting toCheck in settings)
+            {
+                if (toCheck is T value)
+                {
+                    setting = value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets a <see cref="CustomSetting"/>, used for validation.
         /// </summary>
         /// <param name="type">The type of the base setting.</param>
@@ -161,6 +189,10 @@
                 ordered.Add(grouping.Key.Base);
                 ordered.AddRange(grouping.Select(setting => setting.Base));
             }
+
+            // force update stuff like CustomTextAreaSetting to be in PlayerSettings
+            foreach (CustomSetting setting in hasAccess)
+                EnsurePlayerSpecificSetting(player, setting);
 
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
