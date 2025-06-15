@@ -208,7 +208,7 @@
         /// Creates a duplicate of the current setting. Used to properly sync values and implement <see cref="PlayerSettings"/>.
         /// </summary>
         /// <returns>The duplicate setting created.</returns>
-        protected abstract CustomSetting CreatePlayerSetting();
+        protected abstract CustomSetting CreateDuplicate();
 
         /// <summary>
         /// Called before setting is sent to a player. Should be used to create player specific options.
@@ -252,7 +252,7 @@
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {
-                currentSetting = toMatch.CreatePlayerSetting();
+                currentSetting = toMatch.CreateDuplicate();
                 currentSetting.KnownOwner = player;
                 settings.Add(currentSetting);
             }

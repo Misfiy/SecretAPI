@@ -23,7 +23,7 @@
         public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc/>
-        protected override CustomSetting CreatePlayerSetting() => new ExampleDropdownSetting();
+        protected override CustomSetting CreateDuplicate() => new ExampleDropdownSetting();
 
         /// <inheritdoc/>
         protected override void HandleSettingUpdate()
