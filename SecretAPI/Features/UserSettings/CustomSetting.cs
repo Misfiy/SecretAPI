@@ -35,7 +35,8 @@
         /// Initializes a new instance of the <see cref="CustomSetting"/> class.
         /// </summary>
         /// <param name="setting">The setting to use for custom setting.</param>
-        protected CustomSetting(ServerSpecificSettingBase setting)
+        /*/// <param name="owner">The owner of the custom setting.</param>*/
+        protected CustomSetting(ServerSpecificSettingBase setting/*, Player? owner*/)
         {
             Base = setting;
         }
@@ -52,6 +53,12 @@
 
         /// <inheritdoc />
         public ServerSpecificSettingBase Base { get; }
+
+        /// <summary>
+        /// Gets the known owner.
+        /// </summary>
+        /// <remarks>This is null on the original object .</remarks>
+        public Player? KnownOwner { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="CustomHeader"/> of the setting.
@@ -154,7 +161,9 @@
         /// <typeparam name="T">The setting class to check for.</typeparam>
         /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
         public static T? GetPlayerSetting<T>(int id, Player player)
-            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings) ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T : null;
+            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings)
+                ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T
+                : null;
 
         /// <summary>
         /// Updates the settings of a player based on <see cref="CanView"/>.
@@ -167,16 +176,20 @@
             version ??= ServerSpecificSettingsSync.Version;
 
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
+            List<CustomSetting> playerSettings = [];
+            foreach (CustomSetting setting in hasAccess)
+            {
+                CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
+                playerSpecific.UpdatePlayerSetting();
+                playerSettings.Add(playerSpecific);
+            }
+
             List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(setting => setting.Header))
             {
                 ordered.Add(grouping.Key.Base);
                 ordered.AddRange(grouping.Select(setting => setting.Base));
             }
-
-            // force update stuff like CustomTextAreaSetting to be in PlayerSettings
-            foreach (CustomSetting setting in hasAccess)
-                EnsurePlayerSpecificSetting(player, setting);
 
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
@@ -198,10 +211,16 @@
         protected abstract CustomSetting CreateDuplicate();
 
         /// <summary>
-        /// Handles the updating of a setting.
+        /// Called before setting is sent to a player. Should be used to create player specific options.
         /// </summary>
-        /// <param name="player">The player to update.</param>
-        protected abstract void HandleSettingUpdate(Player player);
+        protected virtual void UpdatePlayerSetting()
+        {
+        }
+
+        /// <summary>
+        /// Called when client sends a new value on the setting.
+        /// </summary>
+        protected abstract void HandleSettingUpdate();
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
 
@@ -224,7 +243,7 @@
             settingBase.SerializeValue(valueWriter);
             newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-            newSettingPlayer.HandleSettingUpdate(player);
+            newSettingPlayer.HandleSettingUpdate();
         }
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
@@ -234,6 +253,7 @@
             if (currentSetting == null)
             {
                 currentSetting = toMatch.CreateDuplicate();
+                currentSetting.KnownOwner = player;
                 settings.Add(currentSetting);
             }
 
