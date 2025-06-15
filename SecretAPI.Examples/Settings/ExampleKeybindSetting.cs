@@ -22,7 +22,7 @@ namespace SecretAPI.Examples.Settings
         public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc />
-        protected override CustomSetting CreatePlayerSetting(Player player) => new ExampleKeybindSetting();
+        protected override CustomSetting CreatePlayerSetting() => new ExampleKeybindSetting();
 
         /// <inheritdoc />
         protected override void HandleSettingUpdate()
