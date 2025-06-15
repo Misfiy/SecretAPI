@@ -207,19 +207,18 @@
         /// <summary>
         /// Creates a duplicate of the current setting. Used to properly sync values and implement <see cref="PlayerSettings"/>.
         /// </summary>
-        /// <param name="player">The player who's setting is being created.</param>
         /// <returns>The duplicate setting created.</returns>
-        protected abstract CustomSetting CreatePlayerSetting(Player player);
+        protected abstract CustomSetting CreatePlayerSetting();
 
         /// <summary>
-        /// Called before setting is re-sent to a player. Should be used to create player specific args.
+        /// Called before setting is sent to a player. Should be used to create player specific options.
         /// </summary>
         protected virtual void UpdatePlayerSetting()
         {
         }
 
         /// <summary>
-        /// Handles the updating of a setting.
+        /// Called when client sends a new value on the setting.
         /// </summary>
         protected abstract void HandleSettingUpdate();
 
@@ -253,7 +252,7 @@
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {
-                currentSetting = toMatch.CreatePlayerSetting(player);
+                currentSetting = toMatch.CreatePlayerSetting();
                 currentSetting.KnownOwner = player;
                 settings.Add(currentSetting);
             }
