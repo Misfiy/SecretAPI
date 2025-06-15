@@ -22,15 +22,15 @@ namespace SecretAPI.Examples.Settings
         public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc />
-        protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
+        protected override CustomSetting CreatePlayerSetting(Player player) => new ExampleKeybindSetting();
 
         /// <inheritdoc />
-        protected override void HandleSettingUpdate(Player player)
+        protected override void HandleSettingUpdate()
         {
             if (!IsPressed)
                 return;
 
-            player.Kill();
+            KnownOwner?.Kill();
         }
     }
 }

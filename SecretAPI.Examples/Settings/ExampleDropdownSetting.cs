@@ -14,8 +14,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleDropdownSetting"/> class.
         /// </summary>
-        public ExampleDropdownSetting()
-            : base(901, "Example dropdown", exampleOptions)
+        /// <param name="settings">The array of settings to use.</param>
+        public ExampleDropdownSetting(string[]? settings = null)
+            : base(901, "Example dropdown", settings ?? exampleOptions)
         {
         }
 
@@ -23,10 +24,10 @@
         public override CustomHeader Header { get; } = CustomHeader.Examples;
 
         /// <inheritdoc/>
-        protected override CustomSetting CreateDuplicate() => new ExampleDropdownSetting();
+        protected override CustomSetting CreatePlayerSetting(Player player) => new ExampleDropdownSetting();
 
         /// <inheritdoc/>
-        protected override void HandleSettingUpdate(Player player)
+        protected override void HandleSettingUpdate()
         {
             Logger.Info(SelectedOption);
         }
