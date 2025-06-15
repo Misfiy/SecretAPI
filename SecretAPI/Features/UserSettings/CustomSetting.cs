@@ -97,35 +97,19 @@
         /// <param name="setting">The setting found.</param>
         /// <typeparam name="T">The setting type to find.</typeparam>
         /// <returns>Whether setting was found.</returns>
+        [Obsolete("Use TryGetPlayerSetting<TSetting>(Player, out TSetting)")]
         public static bool TryGet<T>(Player player, [NotNullWhen(true)] out T? setting)
-            where T : CustomSetting
-        {
-            setting = null;
-
-            if (!PlayerSettings.TryGetValue(player, out List<CustomSetting>? settings))
-                return false;
-
-            foreach (CustomSetting toCheck in settings)
-            {
-                if (toCheck is T value)
-                {
-                    setting = value;
-                    return true;
-                }
-            }
-
-            return false;
-        }
+            where T : CustomSetting => TryGetPlayerSetting<T>(player, out setting);
 
         /// <summary>
         /// Tries to get player specific setting.
         /// </summary>
         /// <param name="player">The player to get settings of.</param>
         /// <param name="setting">The setting found.</param>
-        /// <typeparam name="T">The setting type to find.</typeparam>
+        /// <typeparam name="TSetting">The setting type to find.</typeparam>
         /// <returns>Whether setting was found.</returns>
-        public static bool TryGetPlayerSetting<T>(Player player, [NotNullWhen(true)] out T? setting)
-            where T : CustomSetting
+        public static bool TryGetPlayerSetting<TSetting>(Player player, [NotNullWhen(true)] out TSetting? setting)
+            where TSetting : CustomSetting
         {
             setting = null;
 
@@ -134,7 +118,7 @@
 
             foreach (CustomSetting toCheck in settings)
             {
-                if (toCheck is T value)
+                if (toCheck is TSetting value)
                 {
                     setting = value;
                     return true;
