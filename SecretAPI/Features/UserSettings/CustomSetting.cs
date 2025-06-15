@@ -183,16 +183,19 @@
             version ??= ServerSpecificSettingsSync.Version;
 
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
+            List<CustomSetting> playerSettings = [];
+            foreach (CustomSetting setting in hasAccess)
+            {
+                CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
+                playerSettings.Add(playerSpecific);
+            }
+
             List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(setting => setting.Header))
             {
                 ordered.Add(grouping.Key.Base);
                 ordered.AddRange(grouping.Select(setting => setting.Base));
             }
-
-            // force update stuff like CustomTextAreaSetting to be in PlayerSettings
-            foreach (CustomSetting setting in hasAccess)
-                EnsurePlayerSpecificSetting(player, setting);
 
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
