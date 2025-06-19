@@ -47,13 +47,16 @@
         public string[] Options
         {
             get => Base.Options;
-            [Obsolete("Setting this value is not currently supported.")]
-            set => Base.Options = value;
+            set
+            {
+                Base.Options = value;
+                ResyncToOwner();
+            }
         }
 
         /// <summary>
         /// Gets the selected option as string.
         /// </summary>
-        public string SelectedOption => Base.SyncSelectionText;
+        public string SelectedOption => Options[Base.SyncSelectionIndexRaw];
     }
 }

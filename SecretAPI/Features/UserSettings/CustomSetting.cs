@@ -6,7 +6,6 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
-    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
     using SecretAPI.Extensions;
@@ -98,15 +97,16 @@
         public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
 
         /// <summary>
-        /// Tries to get player specific setting.
+        /// Unregisters collection of settings.
         /// </summary>
-        /// <param name="player">The player to get settings of.</param>
-        /// <param name="setting">The setting found.</param>
-        /// <typeparam name="T">The setting type to find.</typeparam>
-        /// <returns>Whether setting was found.</returns>
-        [Obsolete("Use TryGetPlayerSetting<TSetting>(Player, out TSetting)")]
-        public static bool TryGet<T>(Player player, [NotNullWhen(true)] out T? setting)
-            where T : CustomSetting => TryGetPlayerSetting<T>(player, out setting);
+        /// <param name="settings">The settings to unregister.</param>
+        public static void UnRegister(params CustomSetting[] settings) => CustomSettings.RemoveAll(s => settings.Contains(s));
+
+        /// <summary>
+        /// Unregisters a collection of settings.
+        /// </summary>
+        /// <param name="settings">The settings to unregister.</param>
+        public static void UnRegister(IEnumerable<CustomSetting> settings) => CustomSettings.RemoveAll(s => settings.Contains(s));
 
         /// <summary>
         /// Tries to get player specific setting.
@@ -136,6 +136,18 @@
         }
 
         /// <summary>
+        /// Gets a player's <see cref="CustomSetting"/>.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="player">The player of which to get the setting from.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? GetPlayerSetting<T>(int id, Player player)
+            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings)
+            ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T
+            : null;
+
+        /// <summary>
         /// Gets a <see cref="CustomSetting"/>, used for validation.
         /// </summary>
         /// <param name="type">The type of the base setting.</param>
@@ -154,16 +166,14 @@
             where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T;
 
         /// <summary>
-        /// Gets a player's <see cref="CustomSetting"/>.
+        /// Resyncs all settings to all players.
         /// </summary>
-        /// <param name="id">The ID of the setting.</param>
-        /// <param name="player">The player of which to get the setting from.</param>
-        /// <typeparam name="T">The setting class to check for.</typeparam>
-        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
-        public static T? GetPlayerSetting<T>(int id, Player player)
-            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings)
-                ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T
-                : null;
+        /// <param name="version">The version of the setting. If null will use <see cref="ServerSpecificSettingsSync.Version"/>.</param>
+        public static void ResyncServer(int? version = null)
+        {
+            foreach (Player player in Player.ReadyList)
+                SendSettingsToPlayer(player, version);
+        }
 
         /// <summary>
         /// Updates the settings of a player based on <see cref="CanView"/>.
@@ -195,6 +205,15 @@
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
 
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+        }
+
+        /// <summary>
+        /// Resyncs the setting to its owner.
+        /// </summary>
+        protected void ResyncToOwner()
+        {
+            if (KnownOwner != null)
+                SendSettingsToPlayer(KnownOwner);
         }
 
         /// <summary>

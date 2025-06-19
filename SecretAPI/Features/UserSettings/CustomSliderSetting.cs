@@ -63,8 +63,11 @@
         public float MinimumValue
         {
             get => Base.MinValue;
-            [Obsolete("Setting this value is not currently supported.")]
-            set => Base.MinValue = value;
+            set
+            {
+                Base.MinValue = value;
+                ResyncToOwner();
+            }
         }
 
         /// <summary>
@@ -73,8 +76,11 @@
         public float MaximumValue
         {
             get => Base.MaxValue;
-            [Obsolete("Setting this value is not currently supported.")]
-            set => Base.MaxValue = value;
+            set
+            {
+                Base.MaxValue = value;
+                ResyncToOwner();
+            }
         }
 
         /// <summary>
@@ -85,6 +91,19 @@
             get => Base.DefaultValue;
             [Obsolete("Setting this value is not currently supported.")]
             set => Base.DefaultValue = value;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use integer. False will use float.
+        /// </summary>
+        public bool UseInteger
+        {
+            get => Base.Integer;
+            set
+            {
+                Base.Integer = value;
+                ResyncToOwner();
+            }
         }
     }
 }
