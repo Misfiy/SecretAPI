@@ -34,8 +34,7 @@
         /// Initializes a new instance of the <see cref="CustomSetting"/> class.
         /// </summary>
         /// <param name="setting">The setting to use for custom setting.</param>
-        /*/// <param name="owner">The owner of the custom setting.</param>*/
-        protected CustomSetting(ServerSpecificSettingBase setting/*, Player? owner*/)
+        protected CustomSetting(ServerSpecificSettingBase setting)
         {
             Base = setting;
         }
