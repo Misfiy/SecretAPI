@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using LabApi.Features.Wrappers;
     using MapGeneration;
+    using PlayerRoles.FirstPersonControl;
+    using PlayerRoles.PlayableScps.Scp106;
     using UnityEngine;
 
     /// <summary>
@@ -34,6 +36,35 @@
                 return false;
 
             return Physics.Raycast(room.Position, Vector3.down, out _, 2);
+        }
+
+        /// <summary>
+        /// Gets a safe teleport point for a <see cref="Player"/>.
+        /// </summary>
+        /// <param name="player">The player to get teleport point for.</param>
+        /// <param name="zone">The zone to attempt to teleport to player to.</param>
+        /// <param name="range">The range of which the position is allowed to vary from its "point".</param>
+        /// <param name="teleportPoint">The teleport point which was found.</param>
+        /// <returns>Whether a valid position was found.</returns>
+        public static bool GetSafeTeleportPoint(this Player player, FacilityZone zone, float range, out Vector3 teleportPoint)
+        {
+            if (player.RoleBase is not IFpcRole fpcRole)
+            {
+                teleportPoint = Vector3.zero;
+                return false;
+            }
+
+            Pose[] poses = Scp106PocketExitFinder.GetPosesForZone(zone);
+            if (poses.IsEmpty())
+            {
+                teleportPoint = Vector3.zero;
+                return false;
+            }
+
+            Pose pose = Scp106PocketExitFinder.GetRandomPose(poses);
+            Vector3 position = SafeLocationFinder.GetSafePosition(pose.position, pose.rotation.eulerAngles, range, fpcRole.FpcModule.CharController);
+            teleportPoint = position;
+            return true;
         }
     }
 }
