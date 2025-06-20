@@ -8,6 +8,7 @@
     using LabApi.Events.Handlers;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using NorthwoodLib.Pools;
     using SecretAPI.Extensions;
 
     /// <summary>
@@ -183,7 +184,7 @@
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
-            List<CustomSetting> playerSettings = [];
+            List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
             foreach (CustomSetting setting in hasAccess)
             {
                 CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
@@ -191,8 +192,8 @@
                 playerSettings.Add(playerSpecific);
             }
 
-            List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(setting => setting.Header))
+            List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
             {
                 ordered.Add(grouping.Key.Base);
                 ordered.AddRange(grouping.Select(setting => setting.Base));
@@ -201,9 +202,10 @@
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
 
-            ServerSpecificSettingBase[] sendSettings = ordered.ToArray();
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, sendSettings, version);
-            /*player.ReferenceHub.connectionToClient.Send(new SSSEntriesPack(sendSettings, version ?? ServerSpecificSettingsSync.Version));*/
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
+
+            ListPool<CustomSetting>.Shared.Return(playerSettings);
+            ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
         }
 
         /// <summary>
