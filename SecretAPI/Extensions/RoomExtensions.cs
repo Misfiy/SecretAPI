@@ -5,6 +5,7 @@
     using MapGeneration;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.PlayableScps.Scp106;
+    using SecretAPI.Enums;
     using UnityEngine;
 
     /// <summary>
@@ -14,7 +15,6 @@
     {
         private static readonly List<RoomName> KnownUnsafeRooms =
         [
-            RoomName.HczTesla, // Instant death
             RoomName.EzEvacShelter, // Stuck permanently
             RoomName.EzCollapsedTunnel // Stuck permanently
         ];
@@ -23,13 +23,17 @@
         /// Gets whether a room is safe to teleport to. Will consider decontamination, warhead, teslas and void rooms.
         /// </summary>
         /// <param name="room">The room to check.</param>
+        /// <param name="failReasons">Reasons why .</param>
         /// <returns>Whether the room is safe to teleport to.</returns>
-        public static bool IsSafeToTeleport(this Room room)
+        public static bool IsSafeToTeleport(this Room room, RoomSafetyFailReason failReasons)
         {
-            if (Warhead.IsDetonated && room.Zone != FacilityZone.Surface)
+            if (failReasons.HasFlag(RoomSafetyFailReason.Warhead) && Warhead.IsDetonated && room.Zone != FacilityZone.Surface)
                 return false;
 
-            if (Decontamination.IsDecontaminating && room.Zone == FacilityZone.LightContainment)
+            if (failReasons.HasFlag(RoomSafetyFailReason.Decontamination) && Decontamination.IsDecontaminating && room.Zone == FacilityZone.LightContainment)
+                return false;
+
+            if (failReasons.HasFlag(RoomSafetyFailReason.Tesla) && room.Name == RoomName.HczTesla)
                 return false;
 
             if (KnownUnsafeRooms.Contains(room.Name))
