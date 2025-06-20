@@ -11,6 +11,7 @@
     /// <summary>
     /// Extensions related to rooms.
     /// </summary>
+    /// TODO: Make TryGetSafeTeleport(Room)
     public static class RoomExtensions
     {
         private static readonly List<RoomName> KnownUnsafeRooms =
