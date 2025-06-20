@@ -183,10 +183,12 @@
         /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
-            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
             List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
-            foreach (CustomSetting setting in hasAccess)
+            foreach (CustomSetting setting in CustomSettings)
             {
+                if (!setting.CanView(player))
+                    continue;
+
                 CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
                 playerSpecific.UpdatePlayerSetting();
                 playerSettings.Add(playerSpecific);
@@ -196,7 +198,7 @@
             foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
             {
                 ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(setting => setting.Base));
+                ordered.AddRange(grouping.Select(static setting => setting.Base));
             }
 
             if (ServerSpecificSettingsSync.DefinedSettings != null)
