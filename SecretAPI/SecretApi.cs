@@ -44,7 +44,7 @@
         public override void Enable()
         {
             Harmony = new Harmony("SecretAPI" + DateTime.Now);
-            CallOnLoadAttribute.Initialize();
+            CallOnLoadAttribute.Load();
         }
 
         /// <inheritdoc/>

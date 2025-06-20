@@ -26,10 +26,10 @@
         public int Priority { get; }
 
         /// <summary>
-        /// Initializes and calls all <see cref="CallOnLoadAttribute"/>.
+        /// Unloads and calls all <see cref="CallOnUnloadAttribute"/>.
         /// </summary>
         /// <param name="assembly">The assembly to begin this on. Null will attempt to get calling, but may fail.</param>
-        public static void Initialize(Assembly? assembly = null)
+        public static void Unload(Assembly? assembly = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
