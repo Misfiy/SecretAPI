@@ -182,8 +182,6 @@
         /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
-            version ??= ServerSpecificSettingsSync.Version;
-
             IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
             List<CustomSetting> playerSettings = [];
             foreach (CustomSetting setting in hasAccess)
@@ -203,7 +201,9 @@
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
 
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+            ServerSpecificSettingBase[] sendSettings = ordered.ToArray();
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, sendSettings, version);
+            /*player.ReferenceHub.connectionToClient.Send(new SSSEntriesPack(sendSettings, version ?? ServerSpecificSettingsSync.Version));*/
         }
 
         /// <summary>
