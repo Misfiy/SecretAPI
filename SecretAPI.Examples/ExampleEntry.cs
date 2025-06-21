@@ -16,7 +16,7 @@
         private Harmony? harmony;
 
         /// <inheritdoc/>
-        public override string Name { get; } = "SecretAPI.Example";
+        public override string Name { get; } = "SecretAPI.Examples";
 
         /// <inheritdoc/>
         public override string Description { get; } = "An example plugin";

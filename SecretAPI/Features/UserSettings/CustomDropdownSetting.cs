@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
     using System;
+    using System.Linq;
     using global::UserSettings.ServerSpecific;
 
     /// <summary>
@@ -42,21 +43,22 @@
         public new SSDropdownSetting Base { get; }
 
         /// <summary>
+        /// Gets the selected index after validation.
+        /// </summary>
+        public int ValidatedSelectedIndex => Math.Clamp(Base.SyncSelectionIndexRaw, 0, Options.Length - 1);
+
+        /// <summary>
         /// Gets or sets the options.
         /// </summary>
         public string[] Options
         {
             get => Base.Options;
-            set
-            {
-                Base.Options = value;
-                ResyncToOwner();
-            }
+            set => Base.Options = value;
         }
 
         /// <summary>
         /// Gets the selected option as string.
         /// </summary>
-        public string SelectedOption => Options[Base.SyncSelectionIndexRaw];
+        public string SelectedOption => Options[ValidatedSelectedIndex];
     }
 }

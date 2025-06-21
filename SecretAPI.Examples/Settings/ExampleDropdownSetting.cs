@@ -32,13 +32,13 @@
             if (KnownOwner == null || !KnownOwner.HasAnyPermission("example.supporter"))
                 return;
 
-            Base.Options = exampleSupporterOptions;
+            Options = exampleSupporterOptions;
         }
 
         /// <inheritdoc/>
         protected override void HandleSettingUpdate()
         {
-            Logger.Info(SelectedOption);
+            Logger.Info($"{KnownOwner?.DisplayName ?? "null reference"} selected {SelectedOption} (Index {ValidatedSelectedIndex}/{Options.Length})");
         }
     }
 }

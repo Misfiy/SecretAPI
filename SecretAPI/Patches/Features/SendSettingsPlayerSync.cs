@@ -13,9 +13,9 @@
     [HarmonyPatch(typeof(ServerSpecificSettingsSync), nameof(ServerSpecificSettingsSync.SendToPlayer), [typeof(ReferenceHub)])]
     internal static class SendSettingsPlayerSync
     {
-        private static bool Prefix(ReferenceHub referenceHub)
+        private static bool Prefix(ReferenceHub hub)
         {
-            CustomSetting.SendSettingsToPlayer(Player.Get(referenceHub));
+            CustomSetting.SendSettingsToPlayer(Player.Get(hub));
             return false;
         }
     }

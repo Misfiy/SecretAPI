@@ -63,11 +63,7 @@
         public float MinimumValue
         {
             get => Base.MinValue;
-            set
-            {
-                Base.MinValue = value;
-                ResyncToOwner();
-            }
+            set => Base.MinValue = value;
         }
 
         /// <summary>
@@ -76,11 +72,7 @@
         public float MaximumValue
         {
             get => Base.MaxValue;
-            set
-            {
-                Base.MaxValue = value;
-                ResyncToOwner();
-            }
+            set => Base.MaxValue = value;
         }
 
         /// <summary>
@@ -99,11 +91,7 @@
         public bool UseInteger
         {
             get => Base.Integer;
-            set
-            {
-                Base.Integer = value;
-                ResyncToOwner();
-            }
+            set => Base.Integer = value;
         }
     }
 }

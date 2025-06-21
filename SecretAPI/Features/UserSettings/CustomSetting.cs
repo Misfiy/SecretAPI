@@ -6,6 +6,7 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
+    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
     using NorthwoodLib.Pools;
@@ -57,7 +58,7 @@
         /// Gets the known owner.
         /// </summary>
         /// <remarks>This is null on the original object .</remarks>
-        public Player? KnownOwner { get; internal set; }
+        public Player? KnownOwner { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="CustomHeader"/> of the setting.
@@ -65,24 +66,14 @@
         public abstract CustomHeader Header { get; }
 
         /// <summary>
-        /// Gets or sets the current label.
+        /// Gets the current label.
         /// </summary>
-        public string Label
-        {
-            get => Base.Label;
-            [Obsolete("Should not be set after creation.")]
-            set => Base.Label = value;
-        }
+        public string Label => Base.Label;
 
         /// <summary>
-        /// Gets or sets the current id.
+        /// Gets the current id.
         /// </summary>
-        public int Id
-        {
-            get => Base.SettingId;
-            [Obsolete("Should not be set after creation.")]
-            set => Base.SettingId = value;
-        }
+        public int Id => Base.SettingId;
 
         /// <summary>
         /// Registers a collection of settings.
@@ -183,6 +174,9 @@
         /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
+            if (player.IsHost)
+                return;
+
             List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
             foreach (CustomSetting setting in CustomSettings)
             {
@@ -259,12 +253,13 @@
 
             CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
 
-            NetworkWriter entryWriter = new();
+            // NetworkWriter entryWriter = new();
+            // settingBase.SerializeEntry(entryWriter);
+            // newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             NetworkWriter valueWriter = new();
-            settingBase.SerializeEntry(entryWriter);
             settingBase.SerializeValue(valueWriter);
-            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+
             newSettingPlayer.HandleSettingUpdate();
         }
 
