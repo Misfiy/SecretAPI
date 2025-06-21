@@ -43,7 +43,7 @@
         /// <inheritdoc/>
         public override void Enable()
         {
-            Harmony = new Harmony("SecretAPI" + DateTime.Now);
+            Harmony = new Harmony("SecretAPI-" + DateTime.Now.Ticks);
             CustomPlayerEffect.Initialize();
         }
 

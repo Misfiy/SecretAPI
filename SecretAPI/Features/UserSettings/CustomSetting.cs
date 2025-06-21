@@ -9,6 +9,7 @@
     using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
+    using NorthwoodLib.Pools;
     using SecretAPI.Extensions;
 
     /// <summary>
@@ -54,29 +55,25 @@
         public ServerSpecificSettingBase Base { get; }
 
         /// <summary>
+        /// Gets the known owner.
+        /// </summary>
+        /// <remarks>This is null on the original object .</remarks>
+        public Player? KnownOwner { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="CustomHeader"/> of the setting.
         /// </summary>
         public abstract CustomHeader Header { get; }
 
         /// <summary>
-        /// Gets or sets the current label.
+        /// Gets the current label.
         /// </summary>
-        public string Label
-        {
-            get => Base.Label;
-            [Obsolete("Should not be set after creation.")]
-            set => Base.Label = value;
-        }
+        public string Label => Base.Label;
 
         /// <summary>
-        /// Gets or sets the current id.
+        /// Gets the current id.
         /// </summary>
-        public int Id
-        {
-            get => Base.SettingId;
-            [Obsolete("Should not be set after creation.")]
-            set => Base.SettingId = value;
-        }
+        public int Id => Base.SettingId;
 
         /// <summary>
         /// Registers a collection of settings.
@@ -91,15 +88,16 @@
         public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
 
         /// <summary>
-        /// Tries to get player specific setting.
+        /// Unregisters collection of settings.
         /// </summary>
-        /// <param name="player">The player to get settings of.</param>
-        /// <param name="setting">The setting found.</param>
-        /// <typeparam name="T">The setting type to find.</typeparam>
-        /// <returns>Whether setting was found.</returns>
-        [Obsolete("Use TryGetPlayerSetting<TSetting>(Player, out TSetting)")]
-        public static bool TryGet<T>(Player player, [NotNullWhen(true)] out T? setting)
-            where T : CustomSetting => TryGetPlayerSetting<T>(player, out setting);
+        /// <param name="settings">The settings to unregister.</param>
+        public static void UnRegister(params CustomSetting[] settings) => CustomSettings.RemoveAll(s => settings.Contains(s));
+
+        /// <summary>
+        /// Unregisters a collection of settings.
+        /// </summary>
+        /// <param name="settings">The settings to unregister.</param>
+        public static void UnRegister(IEnumerable<CustomSetting> settings) => CustomSettings.RemoveAll(s => settings.Contains(s));
 
         /// <summary>
         /// Tries to get player specific setting.
@@ -129,6 +127,18 @@
         }
 
         /// <summary>
+        /// Gets a player's <see cref="CustomSetting"/>.
+        /// </summary>
+        /// <param name="id">The ID of the setting.</param>
+        /// <param name="player">The player of which to get the setting from.</param>
+        /// <typeparam name="T">The setting class to check for.</typeparam>
+        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
+        public static T? GetPlayerSetting<T>(int id, Player player)
+            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings)
+            ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T
+            : null;
+
+        /// <summary>
         /// Gets a <see cref="CustomSetting"/>, used for validation.
         /// </summary>
         /// <param name="type">The type of the base setting.</param>
@@ -147,14 +157,14 @@
             where T : CustomSetting => CustomSettings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T;
 
         /// <summary>
-        /// Gets a player's <see cref="CustomSetting"/>.
+        /// Resyncs all settings to all players.
         /// </summary>
-        /// <param name="id">The ID of the setting.</param>
-        /// <param name="player">The player of which to get the setting from.</param>
-        /// <typeparam name="T">The setting class to check for.</typeparam>
-        /// <returns>The found <see cref="CustomSetting"/> matching the params, otherwise null.</returns>
-        public static T? GetPlayerSetting<T>(int id, Player player)
-            where T : CustomSetting => PlayerSettings.TryGetValue(player, out List<CustomSetting> settings) ? settings.FirstOrDefault(s => s.Base.SettingId == id && s.GetType() == typeof(T)) as T : null;
+        /// <param name="version">The version of the setting. If null will use <see cref="ServerSpecificSettingsSync.Version"/>.</param>
+        public static void ResyncServer(int? version = null)
+        {
+            foreach (Player player in Player.ReadyList)
+                SendSettingsToPlayer(player, version);
+        }
 
         /// <summary>
         /// Updates the settings of a player based on <see cref="CanView"/>.
@@ -164,24 +174,43 @@
         /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
-            version ??= ServerSpecificSettingsSync.Version;
+            if (player.IsHost)
+                return;
 
-            IEnumerable<CustomSetting> hasAccess = CustomSettings.Where(s => s.CanView(player));
-            List<ServerSpecificSettingBase> ordered = [];
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in hasAccess.GroupBy(setting => setting.Header))
+            List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
+            foreach (CustomSetting setting in CustomSettings)
             {
-                ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(setting => setting.Base));
+                if (!setting.CanView(player))
+                    continue;
+
+                CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
+                playerSpecific.UpdatePlayerSetting();
+                playerSettings.Add(playerSpecific);
             }
 
-            // force update stuff like CustomTextAreaSetting to be in PlayerSettings
-            foreach (CustomSetting setting in hasAccess)
-                EnsurePlayerSpecificSetting(player, setting);
+            List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
+            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
+            {
+                ordered.Add(grouping.Key.Base);
+                ordered.AddRange(grouping.Select(static setting => setting.Base));
+            }
 
             if (ServerSpecificSettingsSync.DefinedSettings != null)
                 ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
 
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, [.. ordered], version);
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
+
+            ListPool<CustomSetting>.Shared.Return(playerSettings);
+            ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
+        }
+
+        /// <summary>
+        /// Resyncs the setting to its owner.
+        /// </summary>
+        protected void ResyncToOwner()
+        {
+            if (KnownOwner != null)
+                SendSettingsToPlayer(KnownOwner);
         }
 
         /// <summary>
@@ -198,10 +227,16 @@
         protected abstract CustomSetting CreateDuplicate();
 
         /// <summary>
-        /// Handles the updating of a setting.
+        /// Called before setting is sent to a player. Should be used to create player specific options.
         /// </summary>
-        /// <param name="player">The player to update.</param>
-        protected abstract void HandleSettingUpdate(Player player);
+        protected virtual void UpdatePlayerSetting()
+        {
+        }
+
+        /// <summary>
+        /// Called when client sends a new value on the setting.
+        /// </summary>
+        protected abstract void HandleSettingUpdate();
 
         private static void RemoveStoredPlayer(Player player) => ReceivedPlayerSettings.Remove(player);
 
@@ -218,13 +253,14 @@
 
             CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
 
-            NetworkWriter entryWriter = new();
+            // NetworkWriter entryWriter = new();
+            // settingBase.SerializeEntry(entryWriter);
+            // newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             NetworkWriter valueWriter = new();
-            settingBase.SerializeEntry(entryWriter);
             settingBase.SerializeValue(valueWriter);
-            newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-            newSettingPlayer.HandleSettingUpdate(player);
+
+            newSettingPlayer.HandleSettingUpdate();
         }
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
@@ -234,6 +270,7 @@
             if (currentSetting == null)
             {
                 currentSetting = toMatch.CreateDuplicate();
+                currentSetting.KnownOwner = player;
                 settings.Add(currentSetting);
             }
 
