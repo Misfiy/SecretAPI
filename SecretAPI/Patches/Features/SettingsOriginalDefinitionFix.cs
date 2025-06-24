@@ -1,8 +1,6 @@
 ﻿namespace SecretAPI.Patches.Features
 {
-    using System;
     using HarmonyLib;
-    using LabApi.Features.Console;
     using SecretAPI.Attribute;
     using SecretAPI.Features.UserSettings;
     using UserSettings.ServerSpecific;
