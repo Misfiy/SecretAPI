@@ -14,6 +14,15 @@
     public static class PlayerExtensions
     {
         /// <summary>
+        /// Adds regeneration to a player.
+        /// </summary>
+        /// <param name="player">The player to add regeneration to.</param>
+        /// <param name="rate">The rate to heal per second.</param>
+        /// <param name="duration">How long the regen should last.</param>
+        public static void AddRegeneration(this Player player, float rate, float duration)
+            => Scp330Bag.AddSimpleRegeneration(player.ReferenceHub, rate, duration);
+
+        /// <summary>
         /// Gets an effect of a player based on the effect name.
         /// </summary>
         /// <param name="player">The player to get effect from.</param>
