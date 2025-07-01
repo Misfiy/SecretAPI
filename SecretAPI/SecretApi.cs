@@ -5,7 +5,7 @@
     using HarmonyLib;
     using LabApi.Loader.Features.Plugins;
     using LabApi.Loader.Features.Plugins.Enums;
-    using SecretAPI.Features.Effects;
+    using SecretAPI.Attribute;
 
     /// <summary>
     /// Main class handling loading API.
@@ -44,7 +44,7 @@
         public override void Enable()
         {
             Harmony = new Harmony("SecretAPI" + DateTime.Now);
-            CustomPlayerEffect.Initialize();
+            CallOnLoadAttribute.Load();
         }
 
         /// <inheritdoc/>
