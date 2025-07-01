@@ -25,12 +25,12 @@ namespace SecretAPI.Examples.Settings
         protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
 
         /// <inheritdoc />
-        protected override void HandleSettingUpdate(Player player)
+        protected override void HandleSettingUpdate()
         {
             if (!IsPressed)
                 return;
 
-            player.Kill();
+            KnownOwner?.Kill();
         }
     }
 }

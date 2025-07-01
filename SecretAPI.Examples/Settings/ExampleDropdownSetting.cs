@@ -1,7 +1,7 @@
 ﻿namespace SecretAPI.Examples.Settings
 {
     using LabApi.Features.Console;
-    using LabApi.Features.Wrappers;
+    using LabApi.Features.Permissions;
     using SecretAPI.Features.UserSettings;
 
     /// <summary>
@@ -10,6 +10,7 @@
     public class ExampleDropdownSetting : CustomDropdownSetting
     {
         private static string[] exampleOptions = ["hi", "test", "yum", "fish", "nugget"];
+        private static string[] exampleSupporterOptions = ["bucket", "lava", "wanted", "globe"];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleDropdownSetting"/> class.
@@ -26,9 +27,18 @@
         protected override CustomSetting CreateDuplicate() => new ExampleDropdownSetting();
 
         /// <inheritdoc/>
-        protected override void HandleSettingUpdate(Player player)
+        protected override void UpdatePlayerSetting()
         {
-            Logger.Info(SelectedOption);
+            if (KnownOwner == null || !KnownOwner.HasAnyPermission("example.supporter"))
+                return;
+
+            Options = exampleSupporterOptions;
+        }
+
+        /// <inheritdoc/>
+        protected override void HandleSettingUpdate()
+        {
+            Logger.Info($"{KnownOwner?.DisplayName ?? "null reference"} selected {SelectedOption} (Index {ValidatedSelectedIndex}/{Options.Length})");
         }
     }
 }
