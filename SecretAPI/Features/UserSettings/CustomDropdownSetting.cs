@@ -1,7 +1,6 @@
 ﻿namespace SecretAPI.Features.UserSettings
 {
     using System;
-    using System.Linq;
     using global::UserSettings.ServerSpecific;
 
     /// <summary>

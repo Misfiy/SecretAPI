@@ -16,7 +16,7 @@
         private static void Postfix(ServerSpecificSettingBase __instance, ref ServerSpecificSettingBase __result)
 #pragma warning restore SA1313
         {
-            // ignore if basegame is success (support non SecretAPI settings)
+            // Prevent handling non SecretAPI settings.
             if (__result != null)
                 return;
 

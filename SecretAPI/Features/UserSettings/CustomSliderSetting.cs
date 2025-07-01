@@ -76,22 +76,13 @@
         }
 
         /// <summary>
-        /// Gets or sets the default value of the setting.
+        /// Gets the default value of the setting.
         /// </summary>
-        public float DefaultValue
-        {
-            get => Base.DefaultValue;
-            [Obsolete("Setting this value is not currently supported.")]
-            set => Base.DefaultValue = value;
-        }
+        public float DefaultValue => Base.DefaultValue;
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use integer. False will use float.
+        /// Gets a value indicating whether to use integer. False will use float.
         /// </summary>
-        public bool UseInteger
-        {
-            get => Base.Integer;
-            set => Base.Integer = value;
-        }
+        public bool UseInteger => Base.Integer;
     }
 }

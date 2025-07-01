@@ -6,7 +6,6 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
-    using LabApi.Features.Console;
     using LabApi.Features.Wrappers;
     using Mirror;
     using NorthwoodLib.Pools;
@@ -57,7 +56,7 @@
         /// <summary>
         /// Gets the known owner.
         /// </summary>
-        /// <remarks>This is null on the original object .</remarks>
+        /// <remarks>This is null on the original object.</remarks>
         public Player? KnownOwner { get; private set; }
 
         /// <summary>
@@ -221,7 +220,7 @@
         protected virtual bool CanView(Player player) => true;
 
         /// <summary>
-        /// Creates a duplicate of the current setting. Used to properly sync values and implement <see cref="PlayerSettings"/>.
+        /// Creates a duplicate of the current setting. Used to properly per player sync and implement <see cref="PlayerSettings"/>.
         /// </summary>
         /// <returns>The duplicate setting created.</returns>
         protected abstract CustomSetting CreateDuplicate();
@@ -256,9 +255,10 @@
             // NetworkWriter entryWriter = new();
             // settingBase.SerializeEntry(entryWriter);
             // newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
-            NetworkWriter valueWriter = new();
+            NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
             settingBase.SerializeValue(valueWriter);
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+            NetworkWriterPool.Return(valueWriter);
 
             newSettingPlayer.HandleSettingUpdate();
         }
