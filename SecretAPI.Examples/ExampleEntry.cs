@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI.Examples
 {
     using System;
+    using System.Reflection;
     using HarmonyLib;
     using LabApi.Features.Console;
     using LabApi.Loader.Features.Plugins;
@@ -16,7 +17,7 @@
         private Harmony? harmony;
 
         /// <inheritdoc/>
-        public override string Name { get; } = "SecretAPI.Example";
+        public override string Name { get; } = "SecretAPI.Examples";
 
         /// <inheritdoc/>
         public override string Description { get; } = "An example plugin";
@@ -33,11 +34,13 @@
         /// <inheritdoc/>
         public override void Enable()
         {
+            Assembly assembly = typeof(ExampleEntry).Assembly;
+
             CustomSetting.Register(new ExampleKeybindSetting(), new ExampleDropdownSetting());
 
             harmony = new Harmony(nameof(ExampleEntry) + DateTime.Now.Ticks);
-            harmony.PatchAllNoCategory();
-            harmony.PatchCategory(nameof(ExampleEntry));
+            harmony.PatchAllNoCategory(assembly);
+            harmony.PatchCategory(nameof(ExampleEntry), assembly);
         }
 
         /// <inheritdoc/>
