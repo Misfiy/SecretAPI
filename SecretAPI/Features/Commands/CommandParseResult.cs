@@ -1,9 +1,9 @@
 ﻿namespace SecretAPI.Features.Commands
 {
     /// <summary>
-    /// Gets the result of <see cref="CustomCommandHandler.TryParse"/>.
+    /// Gets the result of a <see cref="CustomCommandHandler.TryParse"/>.
     /// </summary>
-    public struct CommandResult
+    public struct CommandParseResult
     {
         /// <summary>
         /// Gets a value indicating whether parsing was successful.
@@ -13,6 +13,6 @@
         /// <summary>
         /// If parsing failed, will provide the fail reason, otherwise null.
         /// </summary>
-        public string? FailedResponse;
+        public string FailedResponse;
     }
 }

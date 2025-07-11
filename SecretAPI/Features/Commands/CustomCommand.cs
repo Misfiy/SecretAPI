@@ -19,8 +19,6 @@
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
-        {
-            CommandResult result = CustomCommandHandler.TryCall(sender, arguments);
-        }
+            => CustomCommandHandler.TryCall(this, sender, arguments, out response);
     }
 }
