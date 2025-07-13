@@ -21,12 +21,17 @@
         /// <returns>Whether the command was a success.</returns>
         public static bool TryCall(CustomCommand command, ICommandSender sender, ArraySegment<string> arguments, out string response)
         {
-            CommandParseResult parseResult = TryParse(command, arguments);
+            CommandResult parseResult = TryParse(command, arguments);
             if (!parseResult.CouldParse)
             {
                 response = parseResult.FailedResponse;
                 return false;
             }
+
+            parseResult.Method.Invoke(null, parseResult.ProvidedArguments);
+
+            // TODO: get result & put it into response
+            return true;
         }
 
         /// <summary>
@@ -35,7 +40,7 @@
         /// <param name="command"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static CommandParseResult TryParse(CustomCommand command, ArraySegment<string> arguments)
+        public static CommandResult TryParse(CustomCommand command, ArraySegment<string> arguments)
         {
             const BindingFlags methodFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 
@@ -45,7 +50,7 @@
                 CommandParseResult result = ValidateAllMethodParameters(method, arguments);
                 if (result.CouldParse)
                 {
-                    return new CommandParseResult()
+                    return new CommandResult()
                     {
                         CouldParse = true,
                         FailedResponse = string.Empty,
