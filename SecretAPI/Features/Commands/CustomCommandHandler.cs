@@ -29,19 +29,15 @@
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
         public static CommandParseResult TryParse(CustomCommand command, ArraySegment<string> arguments)
         {
             const BindingFlags methodFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-
-            // IDK!!!
-            if (arguments.Count < 1)
-            {
-                return new CommandParseResult()
-                {
-                    CouldParse = false,
-                    FailedResponse = "Could not parse.",
-                };
-            }
 
             IEnumerable<MethodInfo> methods = command.GetType().GetMethods(methodFlags).Where(IsValidExecuteMethod);
             foreach (MethodInfo method in methods)
@@ -77,28 +73,31 @@
                 return new CommandParseResult()
                 {
                     CouldParse = true,
+                    ParamArgument = parameter.DefaultValue,
                 };
             }
 
-            try
+            Type type = parameter.ParameterType;
+
+            if (type.IsEnum)
             {
-                Type type = parameter.ParameterType;
-
-                if (type.IsEnum)
+                if (Enum.TryParse(type, argument, true, out object? enumValue))
                 {
-                    if (Enum.TryParse(type, argument, true, out object? enumValue))
+                    return new CommandParseResult()
                     {
-                    }
-
-                    return false;
+                        CouldParse = true,
+                        ParamArgument = enumValue,
+                    };
                 }
 
-                return true;
+                return new CommandParseResult()
+                {
+                    CouldParse = false,
+                    FailedResponse = $"Could not pass into valid enum value. Enum required: {type.Name}.",
+                };
             }
-            catch
-            {
-                return false;
-            }
+
+            return true;
         }
 
         private static bool IsValidExecuteMethod(MethodInfo method)

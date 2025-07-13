@@ -14,5 +14,10 @@
         /// If parsing failed, will provide the fail reason, otherwise null.
         /// </summary>
         public string FailedResponse;
+
+        /// <summary>
+        /// The argument for the argument.
+        /// </summary>
+        public object? ParamArgument;
     }
 }
