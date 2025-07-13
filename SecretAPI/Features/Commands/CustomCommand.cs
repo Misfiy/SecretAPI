@@ -17,6 +17,11 @@
         /// <inheritdoc />
         public abstract string Description { get; }
 
+        /// <summary>
+        /// Gets an array of the sub commands for this command.
+        /// </summary>
+        public CustomCommand[] SubCommands { get; } = [];
+
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
             => CustomCommandHandler.TryCall(this, sender, arguments, out response);
