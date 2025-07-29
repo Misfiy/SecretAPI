@@ -3,7 +3,6 @@
     using System;
     using System.Reflection;
     using HarmonyLib;
-    using LabApi.Features.Console;
     using LabApi.Loader.Features.Plugins;
     using SecretAPI.Examples.Settings;
     using SecretAPI.Extensions;

@@ -14,7 +14,7 @@
     public static class PlayerExtensions
     {
         /// <summary>
-        /// Adds regeneration to a player.
+        /// Adds regeneration to a player. TODO: Remove next LabAPI update.
         /// </summary>
         /// <param name="player">The player to add regeneration to.</param>
         /// <param name="rate">The rate to heal per second.</param>
@@ -32,7 +32,7 @@
             => player.ReferenceHub.playerEffectsController.TryGetEffect(name, out StatusEffectBase? effect) ? effect : null!;
 
         /// <summary>
-        /// Gives a random candy to a player.
+        /// Gives a random candy to a player. TODO: Remove next LabAPI update.
         /// </summary>
         /// <param name="player">The player to give candy to.</param>
         /// <param name="reason">The reason to give the candy.</param>
@@ -40,7 +40,7 @@
             => GiveCandy(player, Scp330Candies.GetRandom(), reason);
 
         /// <summary>
-        /// Gives a candy to a player.
+        /// Gives a candy to a player. TODO: Remove next LabAPI update.
         /// </summary>
         /// <param name="player">The player to give candy to.</param>
         /// <param name="candy">The candy to give.</param>
@@ -49,7 +49,7 @@
             => player.ReferenceHub.GrantCandy(candy, reason);
 
         /// <summary>
-        /// Checks if a player has the permission.
+        /// Checks if a player has the permission. TODO: Remove next LabAPI update.
         /// </summary>
         /// <param name="player">The player to check.</param>
         /// <param name="permission">The permission to check.</param>

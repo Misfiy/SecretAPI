@@ -63,9 +63,7 @@
             assembly ??= Assembly.GetCallingAssembly();
 
             foreach (IRegister register in registerables[assembly])
-            {
                 register.TryUnregister();
-            }
 
             registerables.Remove(assembly);
         }
