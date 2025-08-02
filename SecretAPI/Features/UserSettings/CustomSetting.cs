@@ -65,6 +65,16 @@
         public abstract CustomHeader Header { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the setting is server side only.
+        /// </summary>
+        /// <remarks>The setting value cannot be updated from client side and can be used to indicate server features being toggled.</remarks>
+        public bool IsServerOnly
+        {
+            get => Base.IsServerOnly;
+            set => Base.IsServerOnly = value;
+        }
+
+        /// <summary>
         /// Gets the current label.
         /// </summary>
         public string Label => Base.Label;
