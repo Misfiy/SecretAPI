@@ -75,9 +75,22 @@
         }
 
         /// <summary>
-        /// Gets the current label.
+        /// Gets or sets the current label.
         /// </summary>
-        public string Label => Base.Label;
+        public string Label
+        {
+            get => Base.Label;
+            set => Base.Label = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the description hint to show.
+        /// </summary>
+        public string DescriptionHint
+        {
+            get => Base.HintDescription;
+            set => Base.HintDescription = value;
+        }
 
         /// <summary>
         /// Gets the current id.
@@ -218,8 +231,10 @@
         /// </summary>
         protected void ResyncToOwner()
         {
-            if (KnownOwner != null)
-                SendSettingsToPlayer(KnownOwner);
+            if (KnownOwner == null)
+                return;
+
+            SendSettingsToPlayer(KnownOwner);
         }
 
         /// <summary>
