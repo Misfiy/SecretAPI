@@ -23,7 +23,7 @@
             SecretApi.Harmony?.PatchCategory(nameof(CustomSetting));
 
             ServerSpecificSettingsSync.SendOnJoinFilter = null;
-            ServerSpecificSettingsSync.DefinedSettings ??= []; // fix nw issue
+            ServerSpecificSettingsSync.DefinedSettings ??= []; // fix null ref
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
 
             PlayerEvents.Joined += ev => SendSettingsToPlayer(ev.Player);
@@ -95,7 +95,31 @@
         /// <summary>
         /// Gets the current id.
         /// </summary>
-        public int Id => Base.SettingId;
+        public int Id
+        {
+            get => Base.SettingId;
+            init => Base.SettingId = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the Collection ID for the setting. Defaults to <see cref="byte.MaxValue"/>.
+        /// </summary>
+        /// <remarks>Setting value between 0-20 will allow sharing between servers on the same IP.</remarks>
+        public byte CollectionId
+        {
+            get => Base.CollectionId;
+            set => Base.CollectionId = value;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the setting should be shared between servers.
+        /// </summary>
+        /// <remarks><see cref="CollectionId"/> should be used if you are using different settings with the same ID and need extra control.</remarks>
+        public bool IsShared
+        {
+            get => CollectionId < ServerSpecificSettingBase.MaxCollections;
+            set => CollectionId = value ? byte.MinValue : byte.MaxValue;
+        }
 
         /// <summary>
         /// Registers a collection of settings.
