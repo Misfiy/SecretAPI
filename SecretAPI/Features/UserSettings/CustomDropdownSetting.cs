@@ -42,18 +42,22 @@
         public new SSDropdownSetting Base { get; }
 
         /// <summary>
+        /// Gets the selected index after validation.
+        /// </summary>
+        public int ValidatedSelectedIndex => Math.Clamp(Base.SyncSelectionIndexRaw, 0, Options.Length - 1);
+
+        /// <summary>
         /// Gets or sets the options.
         /// </summary>
         public string[] Options
         {
             get => Base.Options;
-            [Obsolete("Setting this value is not currently supported.")]
             set => Base.Options = value;
         }
 
         /// <summary>
         /// Gets the selected option as string.
         /// </summary>
-        public string SelectedOption => Base.SyncSelectionText;
+        public string SelectedOption => Options[ValidatedSelectedIndex];
     }
 }

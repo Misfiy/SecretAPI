@@ -4,6 +4,7 @@
     using System.Linq;
     using Interactables.Interobjects;
     using Mirror;
+    using NorthwoodLib.Pools;
     using UnityEngine;
 
     /// <summary>
@@ -45,7 +46,7 @@
                 if (collection != null)
                     return collection;
 
-                List<TPrefab> allPrefabs = new();
+                List<TPrefab> allPrefabs = ListPool<TPrefab>.Shared.Rent();
 
                 foreach (GameObject gameObject in NetworkClient.prefabs.Values)
                 {
@@ -54,6 +55,8 @@
                 }
 
                 collection = allPrefabs.ToArray();
+                ListPool<TPrefab>.Shared.Return(allPrefabs);
+
                 return collection;
             }
         }
