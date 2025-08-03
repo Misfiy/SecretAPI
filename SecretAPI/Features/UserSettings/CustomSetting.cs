@@ -104,7 +104,7 @@
         /// <summary>
         /// Gets or sets the Collection ID for the setting. Defaults to <see cref="byte.MaxValue"/>.
         /// </summary>
-        /// <remarks>Setting value between 0-20 will allow sharing between servers on the same IP.</remarks>
+        /// <remarks>Setting value between 0-20 will allow sharing between servers on the same Account ID.</remarks>
         public byte CollectionId
         {
             get => Base.CollectionId;
