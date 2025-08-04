@@ -56,7 +56,7 @@
             }
             catch (Exception ex)
             {
-                Logger.Error($"[GlobalPatcher] failed to safely patch {harmony.Id} ({type.FullName}): {ex}");
+                Logger.Error($"[HarmonyExtensions] failed to safely patch {harmony.Id} ({type.FullName}): {ex}");
             }
         }
     }
