@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using CommandSystem;
+    using LabApi.Features.Wrappers;
     using SecretAPI.Attribute;
 
     /// <summary>
@@ -12,6 +13,11 @@
     /// </summary>
     public static class CustomCommandHandler
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string SelfPlayerName = "self";
+
         private static Dictionary<CustomCommand, MethodInfo[]> commandExecuteMethods = new();
 
         /// <summary>
@@ -24,7 +30,9 @@
         /// <returns>Whether the command was a success.</returns>
         public static bool TryCall(CustomCommand command, ICommandSender sender, ArraySegment<string> arguments, out string response)
         {
-            CommandResult parseResult = TryParse(command, arguments);
+            Player senderPlayer = Player.Get(sender) ?? Server.Host!;
+
+            CommandResult parseResult = TryParse(command, senderPlayer, arguments);
             if (!parseResult.CouldParse)
             {
                 response = parseResult.FailedResponse;
@@ -37,17 +45,11 @@
             return true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
-        private static CommandResult TryParse(CustomCommand command, ArraySegment<string> arguments)
+        private static CommandResult TryParse(CustomCommand command, Player sender, ArraySegment<string> arguments)
         {
             foreach (MethodInfo method in GetMethods(command))
             {
-                CommandParseResult result = ValidateAllMethodParameters(method, arguments);
+                CommandParseResult result = ValidateAllMethodParameters(method, sender, arguments);
                 if (result.CouldParse)
                 {
                     return new CommandResult()
@@ -59,18 +61,18 @@
             }
         }
 
-        private static CommandParseResult ValidateAllMethodParameters(MethodInfo method, ArraySegment<string> arguments)
+        private static CommandParseResult ValidateAllMethodParameters(MethodInfo method, Player sender, ArraySegment<string> arguments)
         {
             for (int index = 0; index < method.GetParameters().Length; index++)
             {
                 ParameterInfo parameter = method.GetParameters()[index];
-                CommandParseResult result = ValidateParameter(parameter, arguments.ElementAtOrDefault(index));
+                CommandParseResult result = ValidateParameter(parameter, sender, arguments.ElementAtOrDefault(index));
                 if (!result.CouldParse)
                     return result;
             }
         }
 
-        private static CommandParseResult ValidateParameter(ParameterInfo parameter, string? argument)
+        private static CommandParseResult ValidateParameter(ParameterInfo parameter, Player sender, string? argument)
         {
             // if arg doesnt exist & param is optional, then its validated
             if (argument == null && parameter.IsOptional)
@@ -100,6 +102,26 @@
                     CouldParse = false,
                     FailedResponse = $"Could not pass into valid enum value. Enum required: {type.Name}.",
                 };
+            }
+
+            if (parameter.Name == SelfPlayerName)
+            {
+                if (typeof(Player).IsAssignableFrom(parameter.ParameterType))
+                {
+                    return new CommandParseResult()
+                    {
+                        CouldParse = true,
+                        ParamArgument = sender,
+                    };
+                }
+                else if (typeof(ReferenceHub).IsAssignableFrom(parameter.ParameterType))
+                {
+                    return new CommandParseResult()
+                    {
+                        CouldParse = true,
+                        ParamArgument = sender.ReferenceHub,
+                    };
+                }
             }
 
             return true;
