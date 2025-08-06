@@ -1,7 +1,9 @@
 ﻿namespace SecretAPI.Features.Commands
 {
+    using System.Reflection;
+
     /// <summary>
-    /// Gets the result of a <see cref="CustomCommandHandler.TryParse"/>.
+    /// The result of <see cref="CustomCommandHandler.TryParse"/> to know what to do.
     /// </summary>
     internal struct CommandParseResult
     {
@@ -16,8 +18,13 @@
         public string FailedResponse;
 
         /// <summary>
-        /// The argument for the argument.
+        /// If parsing succeded, the method to call with <see cref="ProvidedArguments"/>.
         /// </summary>
-        public object? ParamArgument;
+        public MethodInfo Method;
+
+        /// <summary>
+        /// If parsing succeeded, the arguments provided.
+        /// </summary>
+        public object[]? ProvidedArguments;
     }
 }

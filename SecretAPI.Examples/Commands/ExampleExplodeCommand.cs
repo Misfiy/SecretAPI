@@ -19,9 +19,9 @@
         public override string Description { get; } = "Explodes a player";
 
         [ExecuteCommand]
-        private void Run(Player self, Player target)
+        private void Run(Player sender, Player target)
         {
-            TimedGrenadeProjectile.SpawnActive(target.Position, ItemType.GrenadeHE, self);
+            TimedGrenadeProjectile.SpawnActive(target.Position, ItemType.GrenadeHE, sender);
         }
     }
 }

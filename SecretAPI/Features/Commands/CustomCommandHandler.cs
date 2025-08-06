@@ -6,6 +6,7 @@
     using System.Reflection;
     using CommandSystem;
     using LabApi.Features.Wrappers;
+    using NorthwoodLib.Pools;
     using SecretAPI.Attribute;
 
     /// <summary>
@@ -14,9 +15,9 @@
     public static class CustomCommandHandler
     {
         /// <summary>
-        /// 
+        /// The name of the <see cref="Player"/> or <see cref="ReferenceHub"/> argument represensing the command sender.
         /// </summary>
-        public const string SelfPlayerName = "self";
+        public const string SenderPlayerName = "sender";
 
         private static Dictionary<CustomCommand, MethodInfo[]> commandExecuteMethods = new();
 
@@ -32,55 +33,86 @@
         {
             Player senderPlayer = Player.Get(sender) ?? Server.Host!;
 
-            CommandResult parseResult = TryParse(command, senderPlayer, arguments);
-            if (!parseResult.CouldParse)
+            CommandParseResult parseParseResult = TryParse(command, senderPlayer, arguments);
+            if (!parseParseResult.CouldParse)
             {
-                response = parseResult.FailedResponse;
+                response = parseParseResult.FailedResponse;
                 return false;
             }
 
-            parseResult.Method.Invoke(null, parseResult.ProvidedArguments);
+            parseParseResult.Method.Invoke(null, parseParseResult.ProvidedArguments);
 
             // TODO: get result & put it into response
             return true;
         }
 
-        private static CommandResult TryParse(CustomCommand command, Player sender, ArraySegment<string> arguments)
+        private static CommandParseResult TryParse(CustomCommand command, Player sender, ArraySegment<string> arguments)
         {
             foreach (MethodInfo method in GetMethods(command))
             {
-                CommandParseResult result = ValidateAllMethodParameters(method, sender, arguments);
+                CommandMethodParseResult result = ValidateAllMethodParameters(method, sender, arguments);
+
+                // parsed correctly, return with correct arguments
                 if (result.CouldParse)
                 {
-                    return new CommandResult()
+                    return new CommandParseResult()
                     {
                         CouldParse = true,
                         FailedResponse = string.Empty,
+                        Method = method,
+                        ProvidedArguments = result.Arguments,
                     };
                 }
+
+                // failed to parse, return and show failure
+                return new CommandParseResult()
+                {
+                    CouldParse = false,
+                    FailedResponse = result.FailedResponse,
+                };
             }
         }
 
-        private static CommandParseResult ValidateAllMethodParameters(MethodInfo method, Player sender, ArraySegment<string> arguments)
+        private static CommandMethodParseResult ValidateAllMethodParameters(MethodInfo method, Player sender, ArraySegment<string> arguments)
         {
-            for (int index = 0; index < method.GetParameters().Length; index++)
+            ParameterInfo[] parameters = method.GetParameters();
+            List<object> returns = ListPool<object>.Shared.Rent();
+
+            for (int index = 0; index < parameters.Length; index++)
             {
-                ParameterInfo parameter = method.GetParameters()[index];
-                CommandParseResult result = ValidateParameter(parameter, sender, arguments.ElementAtOrDefault(index));
-                if (!result.CouldParse)
-                    return result;
+                ParameterInfo parameter = parameters[index];
+                CommandArgParseResult validateResult = ValidateParameter(parameter, sender, arguments.ElementAtOrDefault(index));
+                if (!validateResult.CouldParse)
+                {
+                    return new CommandMethodParseResult()
+                    {
+                        CouldParse = false,
+                        FailedResponse = validateResult.FailedResponse,
+                    };
+                }
+
+                returns.Add(validateResult.ParamArgument);
             }
+
+            CommandMethodParseResult result = new()
+            {
+                CouldParse = true,
+                Arguments = returns.ToArray(),
+            };
+
+            ListPool<object>.Shared.Return(returns);
+            return result;
         }
 
-        private static CommandParseResult ValidateParameter(ParameterInfo parameter, Player sender, string? argument)
+        private static CommandArgParseResult ValidateParameter(ParameterInfo parameter, Player sender, string? argument)
         {
             // if arg doesnt exist & param is optional, then its validated
             if (argument == null && parameter.IsOptional)
             {
-                return new CommandParseResult()
+                return new CommandArgParseResult()
                 {
                     CouldParse = true,
-                    ParamArgument = parameter.DefaultValue,
+                    ParamArgument = parameter.DefaultValue!,
                 };
             }
 
@@ -90,25 +122,25 @@
             {
                 if (Enum.TryParse(type, argument, true, out object? enumValue))
                 {
-                    return new CommandParseResult()
+                    return new CommandArgParseResult()
                     {
                         CouldParse = true,
                         ParamArgument = enumValue,
                     };
                 }
 
-                return new CommandParseResult()
+                return new CommandArgParseResult()
                 {
                     CouldParse = false,
                     FailedResponse = $"Could not pass into valid enum value. Enum required: {type.Name}.",
                 };
             }
 
-            if (parameter.Name == SelfPlayerName)
+            if (parameter.Name == SenderPlayerName)
             {
                 if (typeof(Player).IsAssignableFrom(parameter.ParameterType))
                 {
-                    return new CommandParseResult()
+                    return new CommandArgParseResult()
                     {
                         CouldParse = true,
                         ParamArgument = sender,
@@ -116,7 +148,7 @@
                 }
                 else if (typeof(ReferenceHub).IsAssignableFrom(parameter.ParameterType))
                 {
-                    return new CommandParseResult()
+                    return new CommandArgParseResult()
                     {
                         CouldParse = true,
                         ParamArgument = sender.ReferenceHub,
@@ -124,7 +156,12 @@
                 }
             }
 
-            return true;
+            // all parsing failed
+            return new CommandArgParseResult()
+            {
+                CouldParse = false,
+                FailedResponse = $"Failed to parse {argument ?? null} into type of {parameter.ParameterType.Name}.",
+            };
         }
 
         private static MethodInfo[] GetMethods(CustomCommand command)
