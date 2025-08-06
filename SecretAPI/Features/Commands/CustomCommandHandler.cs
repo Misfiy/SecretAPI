@@ -5,12 +5,15 @@
     using System.Linq;
     using System.Reflection;
     using CommandSystem;
+    using SecretAPI.Attribute;
 
     /// <summary>
     /// Handles parsing <see cref="CustomCommand"/>.
     /// </summary>
     public static class CustomCommandHandler
     {
+        private static Dictionary<CustomCommand, MethodInfo[]> commandExecuteMethods = new();
+
         /// <summary>
         /// Attempts to call the correct command and gives a result.
         /// </summary>
@@ -40,12 +43,9 @@
         /// <param name="command"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static CommandResult TryParse(CustomCommand command, ArraySegment<string> arguments)
+        private static CommandResult TryParse(CustomCommand command, ArraySegment<string> arguments)
         {
-            const BindingFlags methodFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-
-            IEnumerable<MethodInfo> methods = command.GetType().GetMethods(methodFlags).Where(IsValidExecuteMethod);
-            foreach (MethodInfo method in methods)
+            foreach (MethodInfo method in GetMethods(command))
             {
                 CommandParseResult result = ValidateAllMethodParameters(method, arguments);
                 if (result.CouldParse)
@@ -105,23 +105,17 @@
             return true;
         }
 
-        private static bool IsValidExecuteMethod(MethodInfo method)
+        private static MethodInfo[] GetMethods(CustomCommand command)
         {
-            // isnt an Execute command
-            if (method.Name != "Execute")
-                return false;
+            const BindingFlags methodFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 
-            ParameterInfo[] parameters = method.GetParameters();
+            if (!commandExecuteMethods.TryGetValue(command, out MethodInfo[] methods))
+            {
+                methods = command.GetType().GetMethods(methodFlags).Where(m => m.GetCustomAttribute<ExecuteCommandAttribute>() != null).ToArray();
+                commandExecuteMethods.Add(command, methods);
+            }
 
-            // params isnt 3, so its not default
-            if (parameters.Length != 3)
-                return true;
-
-            // make sure params arent the types of the original default to prevent infinite loop
-            return !(parameters[0].ParameterType == typeof(ArraySegment<string>)
-                     && parameters[1].ParameterType == typeof(ICommandSender)
-                     && parameters[2].IsOut
-                     && parameters[2].ParameterType == typeof(string));
+            return methods;
         }
     }
 }
