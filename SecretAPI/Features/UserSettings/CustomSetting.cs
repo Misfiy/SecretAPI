@@ -230,7 +230,7 @@
                     continue;
 
                 CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
-                playerSpecific.UpdatePlayerSetting();
+                playerSpecific.PersonalizeSetting();
                 playerSettings.Add(playerSpecific);
             }
 
@@ -275,9 +275,10 @@
         protected abstract CustomSetting CreateDuplicate();
 
         /// <summary>
-        /// Called before setting is sent to a player. Should be used to create player specific options.
+        /// Called before setting is sent to a player.
         /// </summary>
-        protected virtual void UpdatePlayerSetting()
+        /// <remarks>This should be used to personalize a setting per player, such as supporters having more options.</remarks>
+        protected virtual void PersonalizeSetting()
         {
         }
 
@@ -314,7 +315,7 @@
 
         private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
         {
-            List<CustomSetting> settings = ReceivedPlayerSettings.GetOrAdd(player, () => []);
+            List<CustomSetting> settings = ReceivedPlayerSettings.GetOrAdd(player, static () => []);
             CustomSetting? currentSetting = settings.FirstOrDefault(s => s.Id == toMatch.Id);
             if (currentSetting == null)
             {
