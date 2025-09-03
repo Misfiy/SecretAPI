@@ -27,7 +27,7 @@
         protected override CustomSetting CreateDuplicate() => new ExampleDropdownSetting();
 
         /// <inheritdoc/>
-        protected override void UpdatePlayerSetting()
+        protected override void PersonalizeSetting()
         {
             if (KnownOwner == null || !KnownOwner.HasAnyPermission("example.supporter"))
                 return;
