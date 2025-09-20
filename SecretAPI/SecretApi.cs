@@ -19,7 +19,7 @@
         public override string Description => "API for SCP:SL";
 
         /// <inheritdoc/>
-        public override string Author => "@misfiy";
+        public override string Author => "@misfiy / @obvEvelyn";
 
         /// <inheritdoc/>
         public override LoadPriority Priority => LoadPriority.Highest;
@@ -29,6 +29,9 @@
 
         /// <inheritdoc/>
         public override Version RequiredApiVersion { get; } = new(LabApi.Features.LabApiProperties.CompiledVersion);
+
+        /// <inheritdoc />
+        public override bool IsTransparent => true;
 
         /// <summary>
         /// Gets the harmony to use for the API.

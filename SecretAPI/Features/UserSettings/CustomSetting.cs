@@ -300,14 +300,12 @@
             if (setting == null || !setting.CanView(player))
                 return;
 
+            // validate setting existence and then write data from client
             CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
-
-            // NetworkWriter entryWriter = new();
-            // settingBase.SerializeEntry(entryWriter);
-            // newSettingPlayer.Base.DeserializeEntry(new NetworkReader(entryWriter.buffer));
             NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
             settingBase.SerializeValue(valueWriter);
             newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+
             NetworkWriterPool.Return(valueWriter);
 
             newSettingPlayer.HandleSettingUpdate();

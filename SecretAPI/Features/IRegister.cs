@@ -20,7 +20,7 @@
         public void TryRegister();
 
         /// <summary>
-        /// Attemps to unregister the object.
+        /// Attempts to unregister the object.
         /// </summary>
         public void TryUnregister()
         {

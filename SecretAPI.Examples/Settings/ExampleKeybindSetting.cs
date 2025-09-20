@@ -17,7 +17,7 @@ namespace SecretAPI.Examples.Settings
         }
 
         /// <inheritdoc />
-        public override CustomHeader Header { get; } = CustomHeader.Examples;
+        public override CustomHeader Header => CustomHeader.Examples;
 
         /// <inheritdoc />
         protected override CustomSetting CreateDuplicate() => new ExampleKeybindSetting();
