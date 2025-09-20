@@ -30,8 +30,8 @@
         /// <inheritdoc/>
         public override Version RequiredApiVersion { get; } = new(LabApi.Features.LabApiProperties.CompiledVersion);
 
-        /// <inheritdoc />
-        public override bool IsTransparent => true;
+        /*/// <inheritdoc />
+        public override bool IsTransparent => true;*/
 
         /// <summary>
         /// Gets the harmony to use for the API.
