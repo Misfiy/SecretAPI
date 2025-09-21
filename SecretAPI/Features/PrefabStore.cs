@@ -11,7 +11,7 @@
     /// Handles the storing of a prefab.
     /// </summary>
     /// <typeparam name="TPrefab">The prefab to use.</typeparam>
-    /// <remarks>For Ragdolls and Doors use <see cref="PrefabManager"/>.</remarks>
+    /// <remarks>For Doors use <see cref="PrefabManager"/>.</remarks>
     public static class PrefabStore<TPrefab>
         where TPrefab : NetworkBehaviour
     {

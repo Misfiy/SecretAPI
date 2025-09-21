@@ -13,8 +13,6 @@
     /// </summary>
     public class ExampleEntry : Plugin
     {
-        private readonly Assembly assembly = typeof(ExampleEntry).Assembly;
-
         /// <inheritdoc/>
         public override string Name { get; } = "SecretAPI.Examples";
 
