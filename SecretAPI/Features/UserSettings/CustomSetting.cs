@@ -6,6 +6,7 @@
     using System.Linq;
     using global::UserSettings.ServerSpecific;
     using LabApi.Events.Handlers;
+    using LabApi.Features.Enums;
     using LabApi.Features.Wrappers;
     using Mirror;
     using NorthwoodLib.Pools;
@@ -208,7 +209,8 @@
         /// <param name="version">The version of the setting. If null will use <see cref="ServerSpecificSettingsSync.Version"/>.</param>
         public static void ResyncServer(int? version = null)
         {
-            foreach (Player player in Player.ReadyList)
+            // only update to real players that are authenticated
+            foreach (Player player in Player.GetAll(PlayerSearchFlags.AuthenticatedPlayers))
                 SendSettingsToPlayer(player, version);
         }
 
@@ -220,7 +222,7 @@
         /// <remarks>This will be automatically called on <see cref="PlayerEvents.Joined"/> and <see cref="PlayerEvents.GroupChanged"/>.</remarks>
         public static void SendSettingsToPlayer(Player player, int? version = null)
         {
-            if (player.IsHost)
+            if (player.IsHost || player.IsNpc)
                 return;
 
             List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
