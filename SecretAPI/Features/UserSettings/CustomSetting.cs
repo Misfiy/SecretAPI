@@ -2,10 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using global::UserSettings.ServerSpecific;
 using LabApi.Events.Handlers;
+using LabApi.Features.Console;
 using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
 using Mirror;
@@ -155,13 +157,22 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(params CustomSetting[] settings) => CustomSettings.AddRange(settings);
+    public static void Register(params CustomSetting[] settings)
+    {
+        settings.ForEach(setting => ReportSettingIssue(setting, null));
+        CustomSettings.AddRange(settings);
+    }
 
     /// <summary>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+    public static void Register(IEnumerable<CustomSetting> settings)
+    {
+        foreach (CustomSetting? setting in settings)
+            ReportSettingIssue(setting, null);
+        CustomSettings.AddRange(settings);
+    }
 
     /// <summary>
     /// Unregisters collection of settings.
@@ -320,6 +331,27 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
         }
 
         ListPool<CustomSetting>.Shared.Return(playerSettings);
+    }
+
+    /// <summary>
+    /// Reports issues with settings being registered.
+    /// </summary>
+    /// <param name="setting">The <see cref="CustomSetting"/> to validate.</param>
+    /// <param name="settingBase">The <see cref="ServerSpecificSettingBase"/> to validate.</param>
+    internal static void ReportSettingIssue(CustomSetting? setting, ServerSpecificSettingBase? settingBase)
+    {
+        if (settingBase == null && setting == null)
+        {
+            Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace());
+            return;
+        }
+
+        int id = setting?.Id ?? settingBase!.SettingId;
+        if (CustomSettings.Any(s => s.Id == id) || ServerSpecificSettingsSync.DefinedSettings.Any(s => s.SettingId == id))
+        {
+            Logger.Error($"Setting {setting?.GetType().FullName ?? settingBase?.Label ?? "UNKNOWN"} is being registered with an existing Id {id} {new StackTrace()}");
+            return;
+        }
     }
 
     /// <summary>
