@@ -347,9 +347,10 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
         }
 
         int id = setting?.Id ?? settingBase!.SettingId;
-        if (CustomSettings.Any(s => s.Id == id) || ServerSpecificSettingsSync.DefinedSettings.Any(s => s.SettingId == id))
+        string? sharedIdInfo = CustomSettings.FirstOrDefault(s => s.Id == id)?.GetType().FullName ?? ServerSpecificSettingsSync.DefinedSettings.FirstOrDefault(s => s.SettingId == id)?.Label;
+        if (sharedIdInfo != null)
         {
-            Logger.Error($"[CustomSetting.TryValidateSetting] {setting?.GetType().FullName ?? settingBase?.Label ?? "UNKNOWN"} is being registered with an existing Id {id} {new StackTrace()}");
+            Logger.Error($"[CustomSetting.TryValidateSetting] {setting?.GetType().FullName ?? settingBase?.Label ?? "UNKNOWN"} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace()}");
             return;
         }
     }
