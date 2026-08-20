@@ -46,6 +46,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <summary>
     /// Gets the registered custom settings.
     /// </summary>
+    /// <remarks>Registering a setting directly through this list will result in <see cref="ReportSettingIssue"/> not triggering. You are recommended to use <see cref="Register(IEnumerable{CustomSetting})"/>.</remarks>
     public static List<CustomSetting> CustomSettings { get; } = [];
 
     /// <summary>
@@ -159,8 +160,11 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <param name="settings">The settings to register.</param>
     public static void Register(params CustomSetting[] settings)
     {
-        settings.ForEach(setting => ReportSettingIssue(setting, null));
-        CustomSettings.AddRange(settings);
+        foreach (CustomSetting setting in settings)
+        {
+            ReportSettingIssue(setting, null);
+            CustomSettings.AddRange(settings);
+        }
     }
 
     /// <summary>
@@ -169,9 +173,11 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <param name="settings">The settings to register.</param>
     public static void Register(IEnumerable<CustomSetting> settings)
     {
-        foreach (CustomSetting? setting in settings)
+        foreach (CustomSetting setting in settings)
+        {
             ReportSettingIssue(setting, null);
-        CustomSettings.AddRange(settings);
+            CustomSettings.Add(setting);
+        }
     }
 
     /// <summary>
@@ -342,16 +348,21 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
         if (settingBase == null && setting == null)
         {
-            Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace());
+            Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace(1));
             return;
         }
 
-        int id = setting?.Id ?? settingBase!.SettingId;
-        string? sharedIdInfo = CustomSettings.FirstOrDefault(s => s.Id == id)?.GetType().FullName ?? ServerSpecificSettingsSync.DefinedSettings.FirstOrDefault(s => s.SettingId == id)?.Label;
+        // validating header is pointless and might do unnecessary errors
+        if (settingBase is SSGroupHeader)
+            return;
+
+        string validateSettingName = setting?.GetType().FullName ?? settingBase?.Label ?? "[Unknown]";
+        int? id = setting?.Id ?? settingBase?.SettingId;
+
+        string? sharedIdInfo = CustomSettings.FirstOrDefault(s => s.Id == id)?.GetType().FullName ?? ServerSpecificSettingsSync.DefinedSettings.FirstOrDefault(s => s.SettingId == id && s is not SSGroupHeader)?.Label;
         if (sharedIdInfo != null)
         {
-            Logger.Error($"[CustomSetting.TryValidateSetting] {setting?.GetType().FullName ?? settingBase?.Label ?? "UNKNOWN"} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace()}");
-            return;
+            Logger.Error($"[CustomSetting.TryValidateSetting] {validateSettingName} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace(1)}");
         }
     }
 
