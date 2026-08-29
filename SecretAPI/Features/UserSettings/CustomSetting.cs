@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using global::UserSettings.ServerSpecific;
@@ -45,6 +46,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <summary>
     /// Gets the registered custom settings.
     /// </summary>
+    /// <remarks>Registering a setting directly through this list will result in <see cref="ReportSettingIssue"/> not triggering. You are recommended to use <see cref="Register(IEnumerable{CustomSetting})"/>.</remarks>
     public static List<CustomSetting> CustomSettings { get; } = [];
 
     /// <summary>
@@ -156,13 +158,27 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(params CustomSetting[] settings) => CustomSettings.AddRange(settings);
+    public static void Register(params CustomSetting[] settings)
+    {
+        foreach (CustomSetting setting in settings)
+        {
+            ReportSettingIssue(setting, null);
+            CustomSettings.AddRange(settings);
+        }
+    }
 
     /// <summary>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+    public static void Register(IEnumerable<CustomSetting> settings)
+    {
+        foreach (CustomSetting setting in settings)
+        {
+            ReportSettingIssue(setting, null);
+            CustomSettings.Add(setting);
+        }
+    }
 
     /// <summary>
     /// Unregisters collection of settings.
@@ -329,6 +345,33 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
         }
 
         ListPool<CustomSetting>.Shared.Return(playerSettings);
+    }
+
+    /// <summary>
+    /// Reports issues with settings being registered.
+    /// </summary>
+    /// <param name="setting">The <see cref="CustomSetting"/> to validate.</param>
+    /// <param name="settingBase">The <see cref="ServerSpecificSettingBase"/> to validate.</param>
+    internal static void ReportSettingIssue(CustomSetting? setting, ServerSpecificSettingBase? settingBase)
+    {
+        if (settingBase == null && setting == null)
+        {
+            Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace(1));
+            return;
+        }
+
+        // validating header is pointless and might do unnecessary errors
+        if (settingBase is SSGroupHeader)
+            return;
+
+        string validateSettingName = setting?.GetType().FullName ?? settingBase?.Label ?? "[Unknown]";
+        int? id = setting?.Id ?? settingBase?.SettingId;
+
+        string? sharedIdInfo = CustomSettings.FirstOrDefault(s => s.Id == id)?.GetType().FullName ?? ServerSpecificSettingsSync.DefinedSettings.FirstOrDefault(s => s.SettingId == id && s is not SSGroupHeader)?.Label;
+        if (sharedIdInfo != null)
+        {
+            Logger.Error($"[CustomSetting.TryValidateSetting] {validateSettingName} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace(1)}");
+        }
     }
 
     /// <summary>
