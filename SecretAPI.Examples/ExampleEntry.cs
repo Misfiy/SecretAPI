@@ -11,13 +11,13 @@ using SecretAPI.Features.UserSettings;
 public class ExampleEntry : Plugin
 {
     /// <inheritdoc/>
-    public override string Name { get; } = "SecretAPI.Examples";
+    public override string Name => "SecretAPI.Examples";
 
     /// <inheritdoc/>
-    public override string Description { get; } = "An example plugin";
+    public override string Description => "An example plugin";
 
     /// <inheritdoc/>
-    public override string Author { get; } = "@misfiy / @obvEvelyn";
+    public override string Author => "@obvEve";
 
     /// <inheritdoc/>
     public override Version Version { get; } = typeof(SecretApi).Assembly.GetName().Version;

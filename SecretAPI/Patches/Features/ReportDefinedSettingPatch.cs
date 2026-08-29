@@ -14,6 +14,6 @@ internal static class ReportDefinedSettingPatch
 {
     private static void Postfix(ref ServerSpecificSettingBase[] value)
     {
-        value.ForEach(setting => CustomSetting.ReportSettingIssue(null, setting));
+        value.ForEach(setting => CustomSetting.ValidateSettingInternal(null, setting));
     }
 }

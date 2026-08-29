@@ -46,7 +46,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <summary>
     /// Gets the registered custom settings.
     /// </summary>
-    /// <remarks>Registering a setting directly through this list will result in <see cref="ReportSettingIssue"/> not triggering. You are recommended to use <see cref="Register(IEnumerable{CustomSetting})"/>.</remarks>
+    /// <remarks>Registering a setting directly through this list will result in <see cref="ValidateSettingInternal"/> not triggering. You are recommended to use <see cref="Register(IEnumerable{CustomSetting})"/>.</remarks>
     public static List<CustomSetting> CustomSettings { get; } = [];
 
     /// <summary>
@@ -158,14 +158,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(params CustomSetting[] settings)
-    {
-        foreach (CustomSetting setting in settings)
-        {
-            ReportSettingIssue(setting, null);
-            CustomSettings.AddRange(settings);
-        }
-    }
+    public static void Register(params CustomSetting[] settings) => Register((IEnumerable<CustomSetting>)settings);
 
     /// <summary>
     /// Registers a collection of settings.
@@ -175,8 +168,8 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     {
         foreach (CustomSetting setting in settings)
         {
-            ReportSettingIssue(setting, null);
-            CustomSettings.Add(setting);
+            if (ValidateSettingInternal(setting, null))
+                CustomSettings.Add(setting);
         }
     }
 
@@ -322,8 +315,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
             if (playerSettings.Count != 0)
             {
                 List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
-                foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting =>
-                             setting.Header))
+                foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
                 {
                     ordered.Add(grouping.Key.Base);
                     ordered.AddRange(grouping.Select(static setting => setting.Base));
@@ -352,17 +344,18 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// </summary>
     /// <param name="setting">The <see cref="CustomSetting"/> to validate.</param>
     /// <param name="settingBase">The <see cref="ServerSpecificSettingBase"/> to validate.</param>
-    internal static void ReportSettingIssue(CustomSetting? setting, ServerSpecificSettingBase? settingBase)
+    /// <returns>Whether the setting is validated and considered fine.</returns>
+    internal static bool ValidateSettingInternal(CustomSetting? setting, ServerSpecificSettingBase? settingBase)
     {
         if (settingBase == null && setting == null)
         {
             Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace(1));
-            return;
+            return false;
         }
 
         // validating header is pointless and might do unnecessary errors
         if (settingBase is SSGroupHeader)
-            return;
+            return true;
 
         string validateSettingName = setting?.GetType().FullName ?? settingBase?.Label ?? "[Unknown]";
         int? id = setting?.Id ?? settingBase?.SettingId;
@@ -371,7 +364,10 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
         if (sharedIdInfo != null)
         {
             Logger.Error($"[CustomSetting.TryValidateSetting] {validateSettingName} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace(1)}");
+            return false;
         }
+
+        return true;
     }
 
     /// <summary>
