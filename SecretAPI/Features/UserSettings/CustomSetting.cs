@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using global::UserSettings.ServerSpecific;
 using LabApi.Events.Handlers;
+using LabApi.Features.Console;
 using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
 using Mirror;
@@ -285,38 +286,46 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
             return;
 
         List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
-        foreach (CustomSetting setting in CustomSettings)
+        try
         {
-            if (!setting.CanView(player))
+            foreach (CustomSetting setting in CustomSettings)
             {
-                if (TryGetPlayerSetting(player, setting.Id, false, out CustomSetting? playerSetting))
-                    playerSetting.IsCurrentlyAccessible = false;
-                continue;
+                if (!setting.CanView(player))
+                {
+                    if (TryGetPlayerSetting(player, setting.Id, false, out CustomSetting? playerSetting))
+                        playerSetting.IsCurrentlyAccessible = false;
+                    continue;
+                }
+
+                CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
+                playerSpecific.PersonalizeSetting();
+                playerSpecific.IsCurrentlyAccessible = true;
+                playerSettings.Add(playerSpecific);
             }
 
-            CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
-            playerSpecific.PersonalizeSetting();
-            playerSpecific.IsCurrentlyAccessible = true;
-            playerSettings.Add(playerSpecific);
-        }
-
-        if (playerSettings.Count != 0)
-        {
-            List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
+            if (playerSettings.Count != 0)
             {
-                ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(static setting => setting.Base));
+                List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
+                foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting =>
+                             setting.Header))
+                {
+                    ordered.Add(grouping.Key.Base);
+                    ordered.AddRange(grouping.Select(static setting => setting.Base));
+                }
+
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+
+                ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
+                ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
             }
-
-            ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
-            ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
+            else
+            {
+                ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ServerSpecificSettingsSync.DefinedSettings, version);
+            }
         }
-        else
+        catch (Exception exception)
         {
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ServerSpecificSettingsSync.DefinedSettings, version);
+            Logger.Error(exception);
         }
 
         ListPool<CustomSetting>.Shared.Return(playerSettings);
@@ -387,20 +396,27 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
 
         Player player = Player.Get(hub);
 
-        CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
-        if (setting == null || !setting.CanView(player))
-            return;
+        try
+        {
+            CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
+            if (setting == null || !setting.CanView(player))
+                return;
 
-        // validate setting existence and then write data from client
-        CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
-        newSettingPlayer.HandleBeforeSettingUpdate();
+            // validate setting existence and then write data from client
+            CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
+            newSettingPlayer.HandleBeforeSettingUpdate();
 
-        NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
-        settingBase.SerializeValue(valueWriter);
-        newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-        NetworkWriterPool.Return(valueWriter);
+            NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
+            settingBase.SerializeValue(valueWriter);
+            newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+            NetworkWriterPool.Return(valueWriter);
 
-        newSettingPlayer.HandleSettingUpdate();
+            newSettingPlayer.HandleSettingUpdate();
+        }
+        catch (Exception exception)
+        {
+            Logger.Error(exception);
+        }
     }
 
     private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)
