@@ -2,10 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using global::UserSettings.ServerSpecific;
 using LabApi.Events.Handlers;
+using LabApi.Features.Console;
 using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
 using Mirror;
@@ -44,6 +46,7 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// <summary>
     /// Gets the registered custom settings.
     /// </summary>
+    /// <remarks>Registering a setting directly through this list will result in <see cref="ReportSettingIssue"/> not triggering. You are recommended to use <see cref="Register(IEnumerable{CustomSetting})"/>.</remarks>
     public static List<CustomSetting> CustomSettings { get; } = [];
 
     /// <summary>
@@ -155,13 +158,27 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(params CustomSetting[] settings) => CustomSettings.AddRange(settings);
+    public static void Register(params CustomSetting[] settings)
+    {
+        foreach (CustomSetting setting in settings)
+        {
+            ReportSettingIssue(setting, null);
+            CustomSettings.AddRange(settings);
+        }
+    }
 
     /// <summary>
     /// Registers a collection of settings.
     /// </summary>
     /// <param name="settings">The settings to register.</param>
-    public static void Register(IEnumerable<CustomSetting> settings) => CustomSettings.AddRange(settings);
+    public static void Register(IEnumerable<CustomSetting> settings)
+    {
+        foreach (CustomSetting setting in settings)
+        {
+            ReportSettingIssue(setting, null);
+            CustomSettings.Add(setting);
+        }
+    }
 
     /// <summary>
     /// Unregisters collection of settings.
@@ -285,41 +302,76 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
             return;
 
         List<CustomSetting> playerSettings = ListPool<CustomSetting>.Shared.Rent();
-        foreach (CustomSetting setting in CustomSettings)
+        try
         {
-            if (!setting.CanView(player))
+            foreach (CustomSetting setting in CustomSettings)
             {
-                if (TryGetPlayerSetting(player, setting.Id, false, out CustomSetting? playerSetting))
-                    playerSetting.IsCurrentlyAccessible = false;
-                continue;
+                if (!setting.CanView(player))
+                {
+                    if (TryGetPlayerSetting(player, setting.Id, false, out CustomSetting? playerSetting))
+                        playerSetting.IsCurrentlyAccessible = false;
+                    continue;
+                }
+
+                CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
+                playerSpecific.PersonalizeSetting();
+                playerSpecific.IsCurrentlyAccessible = true;
+                playerSettings.Add(playerSpecific);
             }
 
-            CustomSetting playerSpecific = EnsurePlayerSpecificSetting(player, setting);
-            playerSpecific.PersonalizeSetting();
-            playerSpecific.IsCurrentlyAccessible = true;
-            playerSettings.Add(playerSpecific);
-        }
-
-        if (playerSettings.Count != 0)
-        {
-            List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
-            foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting => setting.Header))
+            if (playerSettings.Count != 0)
             {
-                ordered.Add(grouping.Key.Base);
-                ordered.AddRange(grouping.Select(static setting => setting.Base));
+                List<ServerSpecificSettingBase> ordered = ListPool<ServerSpecificSettingBase>.Shared.Rent();
+                foreach (IGrouping<CustomHeader, CustomSetting> grouping in playerSettings.GroupBy(static setting =>
+                             setting.Header))
+                {
+                    ordered.Add(grouping.Key.Base);
+                    ordered.AddRange(grouping.Select(static setting => setting.Base));
+                }
+
+                ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
+
+                ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
+                ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
             }
-
-            ordered.AddRange(ServerSpecificSettingsSync.DefinedSettings);
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ordered.ToArray(), version);
-            ListPool<ServerSpecificSettingBase>.Shared.Return(ordered);
+            else
+            {
+                ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ServerSpecificSettingsSync.DefinedSettings, version);
+            }
         }
-        else
+        catch (Exception exception)
         {
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, ServerSpecificSettingsSync.DefinedSettings, version);
+            Logger.Error(exception);
         }
 
         ListPool<CustomSetting>.Shared.Return(playerSettings);
+    }
+
+    /// <summary>
+    /// Reports issues with settings being registered.
+    /// </summary>
+    /// <param name="setting">The <see cref="CustomSetting"/> to validate.</param>
+    /// <param name="settingBase">The <see cref="ServerSpecificSettingBase"/> to validate.</param>
+    internal static void ReportSettingIssue(CustomSetting? setting, ServerSpecificSettingBase? settingBase)
+    {
+        if (settingBase == null && setting == null)
+        {
+            Logger.Error("[CustomSetting.TryValidateSetting] Failed to validate null setting! " + new StackTrace(1));
+            return;
+        }
+
+        // validating header is pointless and might do unnecessary errors
+        if (settingBase is SSGroupHeader)
+            return;
+
+        string validateSettingName = setting?.GetType().FullName ?? settingBase?.Label ?? "[Unknown]";
+        int? id = setting?.Id ?? settingBase?.SettingId;
+
+        string? sharedIdInfo = CustomSettings.FirstOrDefault(s => s.Id == id)?.GetType().FullName ?? ServerSpecificSettingsSync.DefinedSettings.FirstOrDefault(s => s.SettingId == id && s is not SSGroupHeader)?.Label;
+        if (sharedIdInfo != null)
+        {
+            Logger.Error($"[CustomSetting.TryValidateSetting] {validateSettingName} is being registered with a duplicate ID ({id}) shared by {sharedIdInfo} {new StackTrace(1)}");
+        }
     }
 
     /// <summary>
@@ -387,20 +439,27 @@ public abstract class CustomSetting : ISetting<ServerSpecificSettingBase>
 
         Player player = Player.Get(hub);
 
-        CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
-        if (setting == null || !setting.CanView(player))
-            return;
+        try
+        {
+            CustomSetting? setting = CustomSettings.FirstOrDefault(s => s.Base.SettingId == settingBase.SettingId);
+            if (setting == null || !setting.CanView(player))
+                return;
 
-        // validate setting existence and then write data from client
-        CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
-        newSettingPlayer.HandleBeforeSettingUpdate();
+            // validate setting existence and then write data from client
+            CustomSetting newSettingPlayer = EnsurePlayerSpecificSetting(player, setting);
+            newSettingPlayer.HandleBeforeSettingUpdate();
 
-        NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
-        settingBase.SerializeValue(valueWriter);
-        newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
-        NetworkWriterPool.Return(valueWriter);
+            NetworkWriterPooled valueWriter = NetworkWriterPool.Get();
+            settingBase.SerializeValue(valueWriter);
+            newSettingPlayer.Base.DeserializeValue(new NetworkReader(valueWriter.buffer));
+            NetworkWriterPool.Return(valueWriter);
 
-        newSettingPlayer.HandleSettingUpdate();
+            newSettingPlayer.HandleSettingUpdate();
+        }
+        catch (Exception exception)
+        {
+            Logger.Error(exception);
+        }
     }
 
     private static CustomSetting EnsurePlayerSpecificSetting(Player player, CustomSetting toMatch)

@@ -12,7 +12,7 @@ using UserSettings.ServerSpecific;
 [HarmonyPatch(typeof(ServerSpecificSettingBase), nameof(ServerSpecificSettingBase.OriginalDefinition), MethodType.Getter)]
 internal static class SettingsOriginalDefinitionFix
 {
-#pragma warning disable SA1313
+#pragma warning disable SA1313 // Parameter '__result' should begin with lower-case letter
     private static void Postfix(ServerSpecificSettingBase __instance, ref ServerSpecificSettingBase __result)
 #pragma warning restore SA1313
     {

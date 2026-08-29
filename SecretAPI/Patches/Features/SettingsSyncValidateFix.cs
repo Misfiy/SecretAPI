@@ -12,7 +12,7 @@ using UserSettings.ServerSpecific;
 [HarmonyPatch(typeof(ServerSpecificSettingsSync), nameof(ServerSpecificSettingsSync.ServerPrevalidateClientResponse))]
 internal static class SettingsSyncValidateFix
 {
-#pragma warning disable SA1313
+#pragma warning disable SA1313 // Parameter '__result' should begin with lower-case letter
     private static void Postfix(SSSClientResponse msg, ref bool __result)
 #pragma warning restore SA1313
     {

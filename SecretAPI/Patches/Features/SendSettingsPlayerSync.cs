@@ -10,7 +10,7 @@ using UserSettings.ServerSpecific;
 /// Fixes <see cref="ServerSpecificSettingsSync.SendToPlayer(ReferenceHub)"/> to resync with <see cref="CustomSetting.SendSettingsToPlayer"/>.
 /// </summary>
 [HarmonyPatchCategory(nameof(CustomSetting))]
-[HarmonyPatch(typeof(ServerSpecificSettingsSync), nameof(ServerSpecificSettingsSync.SendToPlayer), [typeof(ReferenceHub)])]
+[HarmonyPatch(typeof(ServerSpecificSettingsSync), nameof(ServerSpecificSettingsSync.SendToPlayer), typeof(ReferenceHub))]
 internal static class SendSettingsPlayerSync
 {
     private static bool Prefix(ReferenceHub hub)
