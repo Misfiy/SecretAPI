@@ -33,6 +33,7 @@ public abstract class CustomPlayerEffect : StatusEffectBase
     /// <summary>
     /// Initializes the <see cref="CustomPlayerEffect"/> to implement <see cref="EffectsToRegister"/>.
     /// </summary>
+    /// <remarks>The effects must be loaded on before <see cref="Server.Host"/> is created.</remarks>
     [CallOnLoad]
     internal static void Initialize()
     {
@@ -46,7 +47,7 @@ public abstract class CustomPlayerEffect : StatusEffectBase
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        Transform playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject.transform;
+        GameObject playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject;
         foreach (Type type in EffectsToRegister)
         {
             if (!typeof(StatusEffectBase).IsAssignableFrom(type))
@@ -56,7 +57,7 @@ public abstract class CustomPlayerEffect : StatusEffectBase
             }
 
             // register effect into prefab
-            new GameObject(type.Name, type).transform.parent = playerEffects;
+            playerEffects.AddComponent(type);
         }
     }
 }

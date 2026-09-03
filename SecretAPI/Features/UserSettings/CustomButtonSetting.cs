@@ -1,6 +1,7 @@
 ﻿namespace SecretAPI.Features.UserSettings;
 
 using System;
+using System.Diagnostics;
 using global::UserSettings.ServerSpecific;
 
 /// <summary>
@@ -35,9 +36,19 @@ public abstract class CustomButtonSetting : CustomSetting, ISetting<SSButton>
     public new SSButton Base { get; }
 
     /// <summary>
+    /// Gets the <see cref="Stopwatch"/> controlling the last press.
+    /// </summary>
+    public Stopwatch LastPressWatch => Base.SyncLastPress;
+
+    /// <summary>
     /// Gets the <see cref="TimeSpan"/> of the last press.
     /// </summary>
-    public TimeSpan LastPress => Base.SyncLastPress.Elapsed;
+    public TimeSpan LastPress => LastPressWatch.Elapsed;
+
+    /// <summary>
+    /// Gets a value indicating whether the button has ever been pressed.
+    /// </summary>
+    public bool HasPressedEver => LastPressWatch.IsRunning;
 
     /// <summary>
     /// Gets or sets the text of the button.

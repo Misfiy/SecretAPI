@@ -1,12 +1,13 @@
 ﻿namespace SecretAPI;
 
 using System;
+using System.IO;
 using System.Reflection;
 using HarmonyLib;
 using LabApi.Features;
+using LabApi.Loader.Features.Paths;
 using LabApi.Loader.Features.Plugins;
 using LabApi.Loader.Features.Plugins.Enums;
-using SecretAPI.Attributes;
 
 /// <summary>
 /// Main class handling loading API.
@@ -44,6 +45,11 @@ public class SecretApi : Plugin
     /// Gets the Assembly of the API.
     /// </summary>
     internal static Assembly Assembly { get; } = typeof(SecretApi).Assembly;
+
+    /// <summary>
+    /// Gets the config directory within "SCP Secret Laboratory/LabAPI/configs/SecretAPI" for internal use.
+    /// </summary>
+    internal static DirectoryInfo ConfigDirectory { get; } = PathManager.Configs.CreateSubdirectory("SecretAPI");
 
     /// <inheritdoc/>
     public override void Enable()

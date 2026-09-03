@@ -7,6 +7,7 @@ using System.Reflection;
 /// <summary>
 /// Interface used to define a type that should auto register.
 /// </summary>
+// TODO: Source generate this
 public interface IRegister
 {
     /// <summary>
