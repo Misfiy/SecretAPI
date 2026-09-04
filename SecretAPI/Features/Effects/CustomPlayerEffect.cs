@@ -48,16 +48,6 @@ public abstract class CustomPlayerEffect : StatusEffectBase
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
         GameObject playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject;
-        foreach (Type type in EffectsToRegister)
-        {
-            if (!typeof(StatusEffectBase).IsAssignableFrom(type))
-            {
-                Logger.Error($"[CustomPlayerEffect.Initialize] {type.FullName} is not a valid StatusEffectBase and thus could not be registered!");
-                continue;
-            }
-
-            // register effect into prefab
-            playerEffects.AddComponent(type);
-        }
+        _ = new GameObject("SecretAPI-CustomPlayerEffect", EffectsToRegister.ToArray()).transform.parent = playerEffects.transform;
     }
 }
