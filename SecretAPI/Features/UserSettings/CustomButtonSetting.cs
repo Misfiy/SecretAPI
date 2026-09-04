@@ -43,12 +43,18 @@ public abstract class CustomButtonSetting : CustomSetting, ISetting<SSButton>
     /// <summary>
     /// Gets the <see cref="TimeSpan"/> of the last press.
     /// </summary>
-    public TimeSpan LastPress => LastPressWatch.Elapsed;
+    [Obsolete("Use TimeSinceLastPress instead - This will be removed in 4.0")]
+    public TimeSpan LastPress => TimeSinceLastPress;
+
+    /// <summary>
+    /// Gets the <see cref="TimeSpan"/> of the last press.
+    /// </summary>
+    public TimeSpan TimeSinceLastPress => LastPressWatch.Elapsed;
 
     /// <summary>
     /// Gets a value indicating whether the button has ever been pressed.
     /// </summary>
-    public bool HasPressedEver => LastPressWatch.IsRunning;
+    public bool EverPressed => LastPressWatch.IsRunning;
 
     /// <summary>
     /// Gets or sets the text of the button.
