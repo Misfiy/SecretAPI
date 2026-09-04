@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using LabApi.Features.Wrappers;
 using SecretAPI.Attributes;
-using SecretAPI.Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 using Logger = LabApi.Features.Console.Logger;
 
 /// <summary>
@@ -39,6 +39,7 @@ public abstract class CustomPlayerEffect : StatusEffectBase
     {
         EffectsToRegister.Add(typeof(Energized));
         EffectsToRegister.Add(typeof(Depleted));
+        EffectsToRegister.Add(typeof(BlastResistance));
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -47,7 +48,17 @@ public abstract class CustomPlayerEffect : StatusEffectBase
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        GameObject playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject;
-        _ = new GameObject("SecretAPI-CustomPlayerEffect", EffectsToRegister.ToArray()).transform.parent = playerEffects.transform;
+        Transform playerEffects = PrefabStore<ReferenceHub>.Prefab.playerEffectsController.effectsGameObject.transform;
+        foreach (Type type in EffectsToRegister)
+        {
+            if (!typeof(StatusEffectBase).IsAssignableFrom(type))
+            {
+                Logger.Error($"[CustomPlayerEffect.OnSceneLoaded] {type.FullName} is not a valid StatusEffectBase and thus could not be registered!");
+                continue;
+            }
+
+            // register effect into prefab
+            new GameObject(type.Name, type).transform.parent = playerEffects;
+        }
     }
 }

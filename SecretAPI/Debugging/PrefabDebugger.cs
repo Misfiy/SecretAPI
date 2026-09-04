@@ -53,7 +53,7 @@ internal static class PrefabDebugger
             logTexts.Add(txt);
         }
 
-        File.WriteAllLines(Path.Combine(SecretApi.ConfigDirectory.FullName, "debug_prefabs.txt") + "/debug_prefabs.txt", logTexts);
+        File.WriteAllLines(Path.Combine(SecretApi.ConfigDirectory.FullName, "debug_prefabs.txt"), logTexts);
     }
 }
 
