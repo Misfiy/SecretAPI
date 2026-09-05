@@ -4,8 +4,11 @@ namespace SecretAPI.Debugging;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using HarmonyLib;
 using LabApi.Events.Handlers;
+using LabApi.Loader.Features.Paths;
 using Mirror;
 using SecretAPI.Attributes;
 using SecretAPI.Features;
@@ -13,9 +16,9 @@ using UnityEngine;
 using Logger = LabApi.Features.Console.Logger;
 
 /// <summary>
-/// Debugs basegame prefabs by logging information about them.
+/// Debugs base-game prefabs by logging information about them.
 /// </summary>
-//? Possibly write to file instead of server console?
+// ? Possibly write to file instead of server console?
 internal static class PrefabDebugger
 {
     /// <summary>
@@ -29,6 +32,7 @@ internal static class PrefabDebugger
 
     private static void OnWaiting()
     {
+        List<string> logTexts = new();
         foreach (PropertyInfo properties in typeof(PrefabManager).GetProperties())
         {
             try
@@ -44,8 +48,12 @@ internal static class PrefabDebugger
 
         foreach (KeyValuePair<uint, GameObject> pair in NetworkClient.prefabs)
         {
-            Logger.Debug($"[PrefabDebugging] Key ({pair.Key}) - Value ({pair.Value.name})");
+            // Logger.Debug(txt);
+            string txt = $"Prefab Key ({pair.Key}) - Value ({pair.Value.name})";
+            logTexts.Add(txt);
         }
+
+        File.WriteAllLines(Path.Combine(SecretApi.ConfigDirectory.FullName, "debug_prefabs.txt"), logTexts);
     }
 }
 

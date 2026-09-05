@@ -5,12 +5,12 @@ namespace SecretAPI.Debugging;
 using SecretAPI.Attributes;
 
 /// <summary>
-/// Patch debugger.
+/// Ensures all patches are loaded for debug purposes.
 /// </summary>
 internal static class PatchDebugger
 {
     /// <summary>
-    /// Loads the debugs for patches and ensures all patches have loaded.
+    /// Loads the debug.
     /// </summary>
     [CallOnLoad]
     internal static void Load()

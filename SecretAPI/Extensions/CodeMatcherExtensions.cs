@@ -17,12 +17,7 @@ public static class CodeMatcherExtensions
         /// </summary>
         /// <param name="backtrackCount">The amount to reverse. Must be positive number.</param>
         /// <returns>The current <see cref="CodeMatcher"/>.</returns>
-        public CodeMatcher EndAndBacktrack(int backtrackCount)
-        {
-            matcher.End();
-            matcher.Advance(-backtrackCount);
-            return matcher;
-        }
+        public CodeMatcher EndAndBacktrack(int backtrackCount) => matcher.End().Advance(-backtrackCount);
 
         /// <summary>
         /// Declares a local to be used of a certain <see cref="Type"/>.
