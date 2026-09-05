@@ -32,6 +32,7 @@ public class ExampleButtonSetting : CustomButtonSetting
         if (KnownOwner == null)
             return;
 
-        KnownOwner.EnableEffect<Depleted>();
+        KnownOwner.EnableEffect<Depleted>(duration: 30);
+        KnownOwner.EnableEffect<BlastResistance>(200, 30);
     }
 }

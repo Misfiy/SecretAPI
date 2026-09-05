@@ -28,7 +28,7 @@ public class ExampleEntry : Plugin
     /// <inheritdoc/>
     public override void Enable()
     {
-        CustomSetting.Register(new ExampleKeybindSetting(), new ExampleDropdownSetting(), new ExampleButtonSetting());
+        CustomSetting.Register(new ExampleKeybindSetting(), new ExampleDropdownSetting(), new ExampleButtonSetting(), new ExampleFakeSyncButton());
     }
 
     /// <inheritdoc/>
