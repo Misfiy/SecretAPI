@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using global::AdminToys;
 using LabApi.Features.Wrappers;
@@ -56,11 +57,14 @@ public static class MirrorExtensions
     /// </summary>
     /// <param name="target">The target to send the fake data to.</param>
     /// <param name="behaviour">The <see cref="NetworkBehaviour"/> containing the <see cref="SyncList{T}"/>.</param>
-    /// <param name="listIndex">The index of the <see cref="SyncList{T}"/> on the <see cref="NetworkBehaviour"/>.</param>
+    /// <param name="listIndex">The index of the <see cref="SyncList{T}"/> on the <see cref="NetworkBehaviour"/>. <b>The index starts at 1</b>.</param>
     /// <param name="change">The type of change to fake sync.</param>
     /// <typeparam name="T">The type contained by the <see cref="SyncList{T}"/>.</typeparam>
     public static void SendFakeSyncListData<T>(this Player target, NetworkBehaviour behaviour, ulong listIndex, SyncListChange<T> change)
     {
+        if (listIndex <= 0)
+            Logger.Warn($"[MirrorExtensions.SendFakeSyncListData] Index is {listIndex} - Expected 1 or higher!: + {new StackTrace()}");
+
         SendFakeState(target, behaviour, writer =>
         {
             // write the index of the list
