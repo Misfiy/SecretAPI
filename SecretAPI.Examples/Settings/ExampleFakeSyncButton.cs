@@ -42,9 +42,9 @@ public class ExampleFakeSyncButton : CustomButtonSetting
         {
             MirrorExtensions.SyncListChange<string> change = new()
             {
+                Operation = SyncList<string>.Operation.OP_SET,
                 Index = 0,
                 Item = "Fake synced text!",
-                Operation = SyncList<string>.Operation.OP_SET,
             };
 
             KnownOwner.SendFakeSyncListData(textToy.Base, 1L, change);

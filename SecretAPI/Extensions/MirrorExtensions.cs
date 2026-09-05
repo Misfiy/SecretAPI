@@ -227,15 +227,16 @@ public static class MirrorExtensions
         /// <summary>
         /// The operation to do on the <see cref="SyncList{T}"/>.
         /// </summary>
-        public SyncList<T>.Operation Operation;
+        public required SyncList<T>.Operation Operation;
 
         /// <summary>
         /// The index on which the Operation should be performed.
         /// </summary>
+        /// <remarks>This is ignored when Operation is <see cref="SyncList{T}.Operation.OP_CLEAR"/> or <see cref="SyncList{T}.Operation.OP_ADD"/>.</remarks>
         public int Index;
 
         /// <summary>
-        /// The value/item to use. Ignored when Operation is <see cref="SyncList{T}.Operation.OP_REMOVEAT"/>.
+        /// The value/item to use. Ignored when Operation is <see cref="SyncList{T}.Operation.OP_REMOVEAT"/> or <see cref="SyncList{T}.Operation.OP_CLEAR"/>.
         /// </summary>
         public T Item;
     }
