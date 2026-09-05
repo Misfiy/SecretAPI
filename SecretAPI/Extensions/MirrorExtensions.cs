@@ -219,7 +219,7 @@ public static class MirrorExtensions
     }
 
     /// <summary>
-    /// Public version of <see cref="SyncList{T}.Change"/>.
+    /// Public representation of the internal <see cref="SyncList{T}"/> Change class.
     /// </summary>
     /// <typeparam name="T">The item being contained by the <see cref="SyncList{T}"/>.</typeparam>
     public struct SyncListChange<T>
