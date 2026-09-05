@@ -16,7 +16,7 @@ public class ExampleDropdownSetting : CustomDropdownSetting
     /// Initializes a new instance of the <see cref="ExampleDropdownSetting"/> class.
     /// </summary>
     public ExampleDropdownSetting()
-        : base(901, "Example dropdown", ExampleOptions)
+        : base(typeof(ExampleDropdownSetting).FullName?.GetHashCode(), "Example dropdown", ExampleOptions)
     {
     }
 

@@ -1,16 +1,26 @@
 ﻿namespace SecretAPI.Extensions;
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
-using LabApi.Features.Console;
+using global::AdminToys;
 using LabApi.Features.Wrappers;
 using Mirror;
+using Logger = LabApi.Features.Console.Logger;
+
+#pragma warning disable SA1117 // The parameters should all be placed on the same line or each parameter should be placed on its own line
 
 /// <summary>
 /// Extensions related to Mirror.
 /// </summary>
 public static class MirrorExtensions
 {
+    private static readonly Dictionary<Type, ulong> SubWriteClassToMinULong = new()
+    {
+        [typeof(AdminToyBase)] = 32,
+    };
+
     /// <summary>
     /// Send a fake rpc message to a player.
     /// </summary>
@@ -21,6 +31,10 @@ public static class MirrorExtensions
     /// <param name="values">The values to write to the writer.</param>
     public static void SendFakeRpcMessage(this Player target, NetworkBehaviour behaviour, Type type, string rpcName, params object[] values)
     {
+        // validate the target is connected still
+        if (!target.GameObject)
+            return;
+
         NetworkWriterPooled pooledWriter = NetworkWriterPool.Get();
 
         foreach (object obj in values)
@@ -36,6 +50,135 @@ public static class MirrorExtensions
 
         target.Connection.Send(rpcMessage);
         NetworkWriterPool.Return(pooledWriter);
+    }
+
+    /// <summary>
+    /// Sends fake data of a <see cref="SyncList{T}"/> based on parameters.
+    /// </summary>
+    /// <param name="target">The target to send the fake data to.</param>
+    /// <param name="behaviour">The <see cref="NetworkBehaviour"/> containing the <see cref="SyncList{T}"/>.</param>
+    /// <param name="listIndex">The index of the <see cref="SyncList{T}"/> on the <see cref="NetworkBehaviour"/>. <b>The index starts at 1</b>.</param>
+    /// <param name="change">The type of change to fake sync.</param>
+    /// <typeparam name="T">The type contained by the <see cref="SyncList{T}"/>.</typeparam>
+    public static void SendFakeSyncListData<T>(this Player target, NetworkBehaviour behaviour, ulong listIndex, SyncListChange<T> change)
+    {
+        if (listIndex <= 0)
+            Logger.Warn($"[MirrorExtensions.SendFakeSyncListData] Index is {listIndex} - Expected 1 or higher!: + {new StackTrace()}");
+
+        SendFakeState(target, behaviour, writer =>
+        {
+            // write the index of the list
+            writer.WriteULong(listIndex);
+
+            // copied from SyncList<T>.OnSerializeDelta
+            writer.WriteUInt(1); // only 1 change
+            writer.WriteByte((byte)change.Operation);
+            switch (change.Operation)
+            {
+                case SyncList<T>.Operation.OP_ADD:
+                    writer.Write(change.Item);
+                    break;
+                case SyncList<T>.Operation.OP_INSERT:
+                case SyncList<T>.Operation.OP_SET:
+                    writer.WriteUInt((uint)change.Index);
+                    writer.Write(change.Item);
+                    break;
+                case SyncList<T>.Operation.OP_REMOVEAT:
+                    writer.WriteUInt((uint)change.Index);
+                    break;
+            }
+        }, null);
+    }
+
+    /// <summary>
+    /// Sends a fake state of a <see cref="SyncVarAttribute"/> on a <see cref="NetworkBehaviour"/> to a target.
+    /// </summary>
+    /// <param name="target">The player to send the fake state to.</param>
+    /// <param name="behaviour">The behaviour to send fake data of.</param>
+    /// <param name="dirtyBit">The dirty bit of the syncvar to fake.</param>
+    /// <param name="value">The value to fake the syncvar as.</param>
+    /// <typeparam name="T">The type of the sync var.</typeparam>
+    public static void SendFakeSyncVar<T>(this Player target, NetworkBehaviour behaviour, ulong dirtyBit, T value)
+    {
+        SendFakeState(target, behaviour, null, writer =>
+        {
+            // Always write the dirty bit
+            writer.WriteULong(dirtyBit);
+
+            ulong minDirtyBit = GetSubclassMinDirtyBit(behaviour.GetType());
+            bool isWritten = false;
+
+            if (dirtyBit >= minDirtyBit)
+            {
+                writer.WriteULong(dirtyBit);
+                isWritten = true;
+            }
+
+            writer.Write(value);
+
+            if (!isWritten)
+                writer.WriteULong(dirtyBit);
+        });
+    }
+
+    /// <summary>
+    /// Sends a fake entity state based on parameters to a target player.
+    /// </summary>
+    /// <param name="target">The player to send the fake state to.</param>
+    /// <param name="behaviour">The <see cref="NetworkBehaviour"/> to send the fake state of.</param>
+    /// <param name="syncObjectWriter">An Action indicating how to handle writing data related to <see cref="SyncObject"/>s.</param>
+    /// <param name="syncVarWriter">An Action indicating how to handle writing data related to <see cref="SyncVarAttribute"/>s.</param>
+    public static void SendFakeState(this Player target, NetworkBehaviour behaviour, Action<NetworkWriter>? syncObjectWriter, Action<NetworkWriter>? syncVarWriter)
+    {
+        // validate the target is connected still
+        if (!target.GameObject)
+            return;
+
+        using NetworkWriterPooled pooledWriter = NetworkWriterPool.Get();
+
+        // write the compressed bitmask
+        int index = behaviour.netIdentity.NetworkBehaviours.IndexOf(behaviour);
+        ulong mask = (ulong)(1 << index);
+        Compression.CompressVarUInt(pooledWriter, mask);
+
+        // from NetworkBehaviour.Serialize
+        // start serializing
+        int headerPosition = pooledWriter.Position;
+        pooledWriter.WriteByte(0);
+        int contentPosition = pooledWriter.Position;
+
+        if (syncObjectWriter != null)
+            syncObjectWriter.Invoke(pooledWriter);
+        else
+            pooledWriter.WriteULong(0); // only needs to be written once for sync object
+
+        if (syncVarWriter != null)
+        {
+            syncVarWriter.Invoke(pooledWriter);
+        }
+        else
+        {
+            // dirty bit is always 0 in this case
+            pooledWriter.WriteULong(0);
+
+            // write it again for subclass
+            if (GetSubclassMinDirtyBit(behaviour.GetType()) != ulong.MaxValue)
+                pooledWriter.WriteULong(0);
+        }
+
+        // fill in length hash as the last byte of the 4 byte length
+        int endPosition = pooledWriter.Position;
+        pooledWriter.Position = headerPosition;
+        int size = endPosition - contentPosition;
+        byte safety = (byte)(size & 0xFF); // https://github.com/MirrorNetworking/Mirror/blob/master/Assets/Mirror/Core/NetworkBehaviour.cs#L1383
+        pooledWriter.WriteByte(safety);
+        pooledWriter.Position = endPosition;
+
+        target.Connection.Send(new EntityStateMessage()
+        {
+            netId = behaviour.netId,
+            payload = pooledWriter.ToArraySegment(),
+        });
     }
 
     /// <summary>
@@ -61,5 +204,40 @@ public static class MirrorExtensions
         }
 
         del.DynamicInvoke(writer, obj);
+    }
+
+    private static ulong GetSubclassMinDirtyBit(Type type)
+    {
+        // full credit to https://github.com/KadavasKingdom/LabApiExtensions/blob/main/LabApiExtensions/FakeExtension/FakeSyncVarExtension.cs#L17 for this
+        foreach (KeyValuePair<Type, ulong> kvp in SubWriteClassToMinULong)
+        {
+            if (type.IsSubclassOf(kvp.Key))
+                return kvp.Value;
+        }
+
+        return ulong.MaxValue;
+    }
+
+    /// <summary>
+    /// Public representation of the internal <see cref="SyncList{T}"/> Change class.
+    /// </summary>
+    /// <typeparam name="T">The item being contained by the <see cref="SyncList{T}"/>.</typeparam>
+    public struct SyncListChange<T>
+    {
+        /// <summary>
+        /// The operation to do on the <see cref="SyncList{T}"/>.
+        /// </summary>
+        public required SyncList<T>.Operation Operation;
+
+        /// <summary>
+        /// The index on which the Operation should be performed.
+        /// </summary>
+        /// <remarks>This is ignored when Operation is <see cref="SyncList{T}.Operation.OP_CLEAR"/> or <see cref="SyncList{T}.Operation.OP_ADD"/>.</remarks>
+        public int Index;
+
+        /// <summary>
+        /// The value/item to use. Ignored when Operation is <see cref="SyncList{T}.Operation.OP_REMOVEAT"/> or <see cref="SyncList{T}.Operation.OP_CLEAR"/>.
+        /// </summary>
+        public T Item;
     }
 }

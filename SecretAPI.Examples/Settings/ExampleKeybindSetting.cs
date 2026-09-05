@@ -13,7 +13,7 @@ public class ExampleKeybindSetting : CustomKeybindSetting
     /// Initializes a new instance of the <see cref="ExampleKeybindSetting"/> class.
     /// </summary>
     public ExampleKeybindSetting()
-        : base(900, "Example Kill Button", KeyCode.G, allowSpectatorTrigger: false)
+        : base(typeof(ExampleKeybindSetting).FullName?.GetHashCode(), "Example Kill Button", KeyCode.G, allowSpectatorTrigger: false)
     {
     }
 

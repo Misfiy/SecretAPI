@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using LabApi.Features.Wrappers;
 using SecretAPI.Attributes;
-using SecretAPI.Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 using Logger = LabApi.Features.Console.Logger;
 
 /// <summary>
@@ -33,11 +33,13 @@ public abstract class CustomPlayerEffect : StatusEffectBase
     /// <summary>
     /// Initializes the <see cref="CustomPlayerEffect"/> to implement <see cref="EffectsToRegister"/>.
     /// </summary>
+    /// <remarks>The effects must be loaded on before <see cref="Server.Host"/> is created.</remarks>
     [CallOnLoad]
     internal static void Initialize()
     {
         EffectsToRegister.Add(typeof(Energized));
         EffectsToRegister.Add(typeof(Depleted));
+        EffectsToRegister.Add(typeof(BlastResistance));
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -51,7 +53,7 @@ public abstract class CustomPlayerEffect : StatusEffectBase
         {
             if (!typeof(StatusEffectBase).IsAssignableFrom(type))
             {
-                Logger.Error($"[CustomPlayerEffect.Initialize] {type.FullName} is not a valid StatusEffectBase and thus could not be registered!");
+                Logger.Error($"[CustomPlayerEffect.OnSceneLoaded] {type.FullName} is not a valid StatusEffectBase and thus could not be registered!");
                 continue;
             }
 
