@@ -16,6 +16,7 @@ using Logger = LabApi.Features.Console.Logger;
 /// </summary>
 public static class MirrorExtensions
 {
+    private static readonly Dictionary<Type, Delegate> TypeToWriterCache = new();
     private static readonly Dictionary<Type, ulong> SubWriteClassToMinULong = new()
     {
         [typeof(AdminToyBase)] = 32,
@@ -188,6 +189,15 @@ public static class MirrorExtensions
     /// <param name="obj">The object to write.</param>
     public static void ProperWrite(this NetworkWriter writer, object obj)
     {
+        Type type = obj.GetType();
+
+        // caching to avoid unnecessary reflection
+        if (TypeToWriterCache.TryGetValue(type, out Delegate del))
+        {
+            del.DynamicInvoke(writer, obj);
+            return;
+        }
+
         Type genericType = typeof(Writer<>).MakeGenericType(obj.GetType());
         FieldInfo? writeField = genericType.GetField("write", BindingFlags.Static | BindingFlags.Public);
         if (writeField == null)
@@ -197,13 +207,14 @@ public static class MirrorExtensions
         }
 
         object? writeDelegate = writeField.GetValue(null);
-        if (writeDelegate is not Delegate del)
+        if (writeDelegate is not Delegate dele)
         {
             Logger.Warn($"Writer<{obj.GetType()}>.write is not a delegate!");
             return;
         }
 
-        del.DynamicInvoke(writer, obj);
+        TypeToWriterCache.Add(type, dele);
+        dele.DynamicInvoke(writer, obj);
     }
 
     private static ulong GetSubclassMinDirtyBit(Type type)
